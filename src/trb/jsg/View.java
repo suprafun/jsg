@@ -66,7 +66,6 @@ public class View implements Serializable {
 	private Plane[] worldPlanes = new Plane[6];
 	
 	// temp vars
-	private Point3d center3d = new Point3d();
 	private Point3d lower = new Point3d();
 	private Point3d upper = new Point3d();
 	
@@ -196,8 +195,7 @@ public class View implements Serializable {
 	 * @return true if BoundingSphere is inside frustum
 	 */
 	public boolean isInsideFrustum(Matrix4f modelViewMatrix, BoundingSphere boundingSphere, Point3f center3f) {
-		boundingSphere.getCenter(center3d);
-		center3f.set(center3d);
+		center3f.set(boundingSphere.getCenter());
 		modelViewMatrix.transform(center3f);
 		float radius = (float) boundingSphere.getRadius();
 		

@@ -114,9 +114,7 @@ class RetainedShape implements ShapePeer {
 	 * Updates the worldBoundsCenter member.
 	 */
 	public void updateWorldBoundsCenter() {
-		Point3d center3d = new Point3d();
-		shape.getVertexData().getBoundingSphere().getCenter(center3d);
-		worldBoundsCenter.set(center3d);
+		worldBoundsCenter.set(shape.getVertexData().getBoundingSphere().getCenter());
 		shape.getModelMatrix().transform(worldBoundsCenter);
 	}
 	

@@ -172,8 +172,8 @@ public class VertexData implements Serializable {
 		Point3f center = new Point3f();
 		center.add(lower, upper);
 		center.scale(0.5f);
-		boundingSphere = new BoundingSphere(new Point3d(center), 0.0000001);
-		Point3d currentP3d = new Point3d();
+		boundingSphere = new BoundingSphere(center, 0.0000001f);
+		Point3f currentP3d = new Point3f();
 		for (int vertexOff=0; vertexOff<coordinates.limit(); vertexOff+=3) {
 			currentP3d.set(coordinates.get(vertexOff+0)
 					, coordinates.get(vertexOff+1)
@@ -226,10 +226,8 @@ public class VertexData implements Serializable {
 		
 		out.writeBoolean(boundingSphere != null);
 		if (boundingSphere != null) {
-			Point3d center = new Point3d();
-			boundingSphere.getCenter(center);
-			out.writeObject(center);
-			out.writeFloat((float) boundingSphere.getRadius());
+			out.writeObject(boundingSphere.getCenter());
+			out.writeFloat(boundingSphere.getRadius());
 		}
 	}
 	
@@ -312,7 +310,7 @@ public class VertexData implements Serializable {
 		}
 		boolean hasBoundingSphere = in.readBoolean();
 		if (hasBoundingSphere) {
-			Point3d center = (Point3d) in.readObject();
+			Point3f center = (Point3f) in.readObject();
 			float radius = in.readFloat();
 			boundingSphere = new BoundingSphere(center, radius);
 		}

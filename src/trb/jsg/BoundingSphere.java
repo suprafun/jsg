@@ -45,12 +45,12 @@ public class BoundingSphere {
 	/**
 	 * The center of the bounding sphere.
 	 */
-	Point3d center;
+	Point3f center;
 
 	/**
 	 * The radius of the bounding sphere.
 	 */
-	double radius;
+	float radius;
 
 	/**
 	 * Constructs and initializes a BoundingSphere from a center and radius.
@@ -60,8 +60,8 @@ public class BoundingSphere {
 	 * @param radius
 	 *            the radius of the bounding sphere
 	 */
-	public BoundingSphere(Point3d center, double radius) {
-		this.center = new Point3d(center);
+	public BoundingSphere(Point3f center, float radius) {
+		this.center = new Point3f(center);
 		this.radius = radius;
 	}
 
@@ -69,8 +69,8 @@ public class BoundingSphere {
 	 * Constructs and initializes a BoundingSphere with radius = 1 at 0 0 0.
 	 */
 	public BoundingSphere() {
-		center = new Point3d();
-		radius = 1.0;
+		center = new Point3f();
+		radius = 1f;
 	}
 
 	/**
@@ -78,40 +78,35 @@ public class BoundingSphere {
 	 * 
 	 * @return the radius of the bounding sphere
 	 */
-	public double getRadius() {
+	public float getRadius() {
 		return radius;
 	}
 
 	/**
 	 * Sets the radius of this bounding sphere from a double.
 	 * 
-	 * @param r
-	 *            the new radius for the bounding sphere
+	 * @param r the new radius for the bounding sphere
 	 */
-	public void setRadius(double r) {
+	public void setRadius(float r) {
 		radius = r;
 	}
 
 	/**
-	 * Returns the position of this bounding sphere as a point.
+	 * Returns a reference to the position of this bounding sphere.
 	 * 
-	 * @param center
-	 *            a Point to receive the center of the bounding sphere
+	 * @return a reference to the center of the bounding sphere
 	 * 
 	 */
-	public void getCenter(Point3d center) {
-		center.x = this.center.x;
-		center.y = this.center.y;
-		center.z = this.center.z;
+	public Point3f getCenter() {
+		return center;
 	}
 
 	/**
 	 * Sets the position of this bounding sphere from a point.
 	 * 
-	 * @param center
-	 *            a Point defining the new center of the bounding sphere
+	 * @param center a Point defining the new center of the bounding sphere
 	 */
-	public void setCenter(Point3d center) {
+	public void setCenter(Point3f center) {
 		this.center.x = center.x;
 		this.center.y = center.y;
 		this.center.z = center.z;
@@ -123,14 +118,14 @@ public class BoundingSphere {
 	 * @param point
 	 *            a 3D point in space
 	 */
-	public void combine(Point3d point) {
-		double dis = Math.sqrt((point.x - center.x) * (point.x - center.x)
+	public void combine(Point3f point) {
+		float dis = (float) Math.sqrt((point.x - center.x) * (point.x - center.x)
 				+ (point.y - center.y) * (point.y - center.y)
 				+ (point.z - center.z) * (point.z - center.z));
 
 		if (dis > radius) {
-			radius = (dis + radius) * .5;
-			double oldc_to_new_c = dis - radius;
+			radius = (dis + radius) * .5f;
+			float oldc_to_new_c = dis - radius;
 			center.x = (radius * center.x + oldc_to_new_c * point.x) / dis;
 			center.y = (radius * center.y + oldc_to_new_c * point.y) / dis;
 			center.z = (radius * center.z + oldc_to_new_c * point.z) / dis;
@@ -143,9 +138,9 @@ public class BoundingSphere {
 	 * @param points
 	 *            an array of 3D points in space
 	 */
-	public void combine(Point3d[] points) {
+	public void combine(Point3f[] points) {
 		int i;
-		double dis, dis_sq, rad_sq, oldc_to_new_c;
+		float dis, dis_sq, rad_sq, oldc_to_new_c;
 		for (i = 0; i < points.length; i++) {
 			rad_sq = radius * radius;
 			dis_sq = (points[i].x - center.x) * (points[i].x - center.x)
@@ -155,8 +150,8 @@ public class BoundingSphere {
 			// change sphere so one side passes through the point and
 			// other passes through the old sphere
 			if (dis_sq > rad_sq) {
-				dis = Math.sqrt(dis_sq);
-				radius = (radius + dis) * .5;
+				dis = (float) Math.sqrt(dis_sq);
+				radius = (radius + dis) * .5f;
 				oldc_to_new_c = dis - radius;
 				center.x = (radius * center.x + oldc_to_new_c * points[i].x)
 						/ dis;
@@ -166,9 +161,5 @@ public class BoundingSphere {
 						/ dis;
 			}
 		}
-	}
-
-	Point3d getCenter() {
-		return center;
 	}
 }
