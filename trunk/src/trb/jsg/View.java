@@ -150,8 +150,8 @@ public class View implements Serializable {
 	 * @param f far
 	 */
 	public void ortho(float l, float r, float t, float b, float n, float f) {
-		if (f<n || n<=0) {
-			System.out.println("far plane should be larger than near, and both should be positive");
+		if (f<n) {
+			System.out.println("far plane should be larger than near");
 		}
 		
 		Matrix4f p = new Matrix4f();
