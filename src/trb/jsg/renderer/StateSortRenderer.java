@@ -457,7 +457,7 @@ class StateSortRenderer {
 			}
 			RenderInfo.visibleShapes++;
 
-			if (!view.isInsideFrustum(peer.worldBoundsCenter, (float) shape.getVertexData().getBoundingSphere().getRadius())) {
+			if (!view.isInsideFrustum(peer.worldBoundsCenter, shape.getVertexData().getBoundingSphere().getRadius())) {
 				continue;
 			}
 			RenderInfo.shapesInFrustum++;
