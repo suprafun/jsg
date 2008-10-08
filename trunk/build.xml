@@ -16,6 +16,7 @@
     <fileset dir="${lib.home}">
       <include name="*.jar"/>
     </fileset>
+    <pathelement path="${build.home}/classes" />
   </path>
 
   <target name="all" depends="clean, compile" description="Clean build and dist directories, then compile"/>
@@ -44,6 +45,12 @@
   <target name="jar" depends="compile">
     <jar jarfile="${build.home}/jsg.jar" basedir="${build.home}/classes" compress="true">
     </jar>
+  </target>
+
+  <target name="run" depends="jar" description="Runs Hello World">
+    <java classname="trb.jsg.tests.HelloWorld" fork="true" classpathref="compile.classpath">
+       <jvmarg value="-Djava.library.path=${lib.home}" />
+    </java>
   </target>
 
   <target name="javadoc" depends="compile" description="Create Javadoc API documentation">
