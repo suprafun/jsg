@@ -169,16 +169,19 @@ public class View implements Serializable {
 		
 		// create the planes of the camera
 		planes[0] = new Plane(new Point3f(0,0,(float)-n), new Point3f(0,0,-1));
-		planes[1] = new Plane(new Point3f(l, 0, 0), new Point3f(-1, 0, 0));
-		planes[2] = new Plane(new Point3f(r, 0, 0), new Point3f( 1, 0, 0));
-		planes[3] = new Plane(new Point3f(0, t, 0), new Point3f( 0, -1, 0));
-		planes[4] = new Plane(new Point3f(0, b, 0), new Point3f( 0,  1, 0));
+		planes[1] = new Plane(new Point3f(l, 0, 0), new Point3f( 1, 0, 0));
+		planes[2] = new Plane(new Point3f(r, 0, 0), new Point3f(-1, 0, 0));
+		planes[3] = new Plane(new Point3f(0, t, 0), new Point3f( 0,  1, 0));
+		planes[4] = new Plane(new Point3f(0, b, 0), new Point3f( 0, -1, 0));
 		planes[5] = new Plane(new Point3f(0,0,(float)-f),  new Point3f(0,0,1));
 		
 		if (t > b) {
-			for (int i=1; i<5; i++) {
-				planes[i].N.scale(-1);
-			}
+			planes[3].N.scale(-1);
+			planes[4].N.scale(-1);
+		}
+		if (l > r) {
+			planes[1].N.scale(-1);
+			planes[2].N.scale(-1);
 		}
 	}
 	
