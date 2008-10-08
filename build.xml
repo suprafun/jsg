@@ -1,0 +1,64 @@
+<project name="Java Scene Graph" default="jar" basedir=".">
+
+  <property file="build.properties"/>
+  <property file="${user.home}/build.properties"/>
+
+  <property name="build.home"    value="${basedir}/build"/>
+  <property name="lib.home"      value="${basedir}/lib"/>
+  <property name="docs.home"     value="${basedir}/docs"/>
+  <property name="src.home"      value="${basedir}/src"/>
+  
+  <property name="compile.debug"       value="true"/>
+  <property name="compile.deprecation" value="false"/>
+  <property name="compile.optimize"    value="true"/>
+
+  <path id="compile.classpath">
+    <fileset dir="${lib.home}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="all" depends="clean, compile" description="Clean build and dist directories, then compile"/>
+
+  <target name="clean" description="Delete old build and dist directories">
+    <delete dir="${build.home}"/>
+  </target>
+
+  <target name="compile" depends="prepare" description="Compile Java sources">
+    <!-- Compile Java classes as necessary -->
+    <mkdir    dir="${build.home}/classes"/>
+    <javac srcdir="${src.home}"
+          destdir="${build.home}/classes"
+            debug="${compile.debug}"
+      deprecation="${compile.deprecation}"
+         optimize="${compile.optimize}">
+        <classpath refid="compile.classpath"/>
+    </javac>
+
+    <!-- Copy application resources -->
+    <copy  todir="${build.home}/classes">
+      <fileset dir="${src.home}" excludes="**/*.java"/>
+    </copy>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar jarfile="${build.home}/jsg.jar" basedir="${build.home}/classes" compress="true">
+    </jar>
+  </target>
+
+  <target name="javadoc" depends="compile" description="Create Javadoc API documentation">
+    <javadoc sourcepath="${src.home}"
+             destdir="${basedir}/docs"
+             packagenames="*">
+      <classpath refid="compile.classpath"/>
+    </javadoc>
+  </target>
+
+  <target name="prepare">
+
+    <!-- Create build directories as needed -->
+    <mkdir  dir="${build.home}"/>
+    <mkdir  dir="${build.home}/classes"/>
+  </target>
+
+</project>
