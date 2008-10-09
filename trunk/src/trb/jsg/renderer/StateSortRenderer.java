@@ -404,7 +404,7 @@ class StateSortRenderer {
 
 			peer.draw();
 			// 155 fps (data is in buffers)
-//			((SimpleVertexDataPeer) shape.vertexData.nativePeer).drawImmidiate();
+//			((SimpleVertexDataPeer) shape.vertexData.nativePeer).drawImmediate();
 			// 264 fps
 //			clientState = ((SimpleVertexDataPeer) shape.vertexData.nativePeer).drawVertexArray(clientState);
 			// 280 (after bounds change)

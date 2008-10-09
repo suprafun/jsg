@@ -80,7 +80,7 @@ class RetainedShape implements ShapePeer {
 	public VBOShapeList.Handle vboHandle;
 	
 	/**
-	 * IMMIDIATE - immidiate mode
+	 * IMMEDIATE - immediate mode
 	 * VERTEX_ARRAY - vertex array
 	 * DISPLAY_LIST - display list
 	 * DISPLAY_LIST_WORLD - display list where coordinates is stored in world space relative to this shape.
@@ -88,7 +88,7 @@ class RetainedShape implements ShapePeer {
 	 * @author tombr
 	 *
 	 */
-	public enum RenderType {IMMIDIATE, VERTEX_ARRAY, DISPLAY_LIST, DISPLAY_LIST_WORLD, SHARED_VBO};
+	public enum RenderType {IMMEDIATE, VERTEX_ARRAY, DISPLAY_LIST, DISPLAY_LIST_WORLD, SHARED_VBO};
 	
 	/** How the vertices are rendered */
 	public RenderType renderType = RenderType.VERTEX_ARRAY;
@@ -350,8 +350,8 @@ class RetainedShape implements ShapePeer {
 		}
 		
 		switch (renderType) {
-		case IMMIDIATE:
-			((RetainedVertexData) shape.getVertexData().nativePeer).drawImmidiate(null);
+		case IMMEDIATE:
+			((RetainedVertexData) shape.getVertexData().nativePeer).drawImmediate(null);
 			if (worldDisplayListId > 0) {
 				worldBBox = null;
 				GL11.glDeleteLists(worldDisplayListId, 1);
@@ -379,7 +379,7 @@ class RetainedShape implements ShapePeer {
 				worldDisplayListId = GL11.glGenLists(1);
 				GL11.glNewList(worldDisplayListId, GL11.GL_COMPILE);
 				RetainedVertexData vertexDataPeer = ((RetainedVertexData) shape.getVertexData().nativePeer); 
-				vertexDataPeer.drawImmidiate(shape.getModelMatrix());
+				vertexDataPeer.drawImmediate(shape.getModelMatrix());
 				worldBBox = vertexDataPeer.calculateBoundingBox(shape.getModelMatrix()); 
 				GL11.glEndList();
 			}
