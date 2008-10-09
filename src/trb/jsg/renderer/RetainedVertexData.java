@@ -165,7 +165,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 	
 			listId = GL11.glGenLists(1);
 			GL11.glNewList(listId, GL11.GL_COMPILE);
-			drawImmidiate(null);
+			drawImmediate(null);
 			GL11.glEndList();
 		}
 	}
@@ -182,7 +182,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 	/**
 	 * Draws the shape using immediate mode calls.
 	 */
-	public void drawImmidiate(Matrix4f localToWorldMatrix) {
+	public void drawImmediate(Matrix4f localToWorldMatrix) {
 		FloatBuffer coords = vertexData.coordinates;
 		FloatBuffer colors = vertexData.colors;
 		FloatBuffer normals = vertexData.normals;

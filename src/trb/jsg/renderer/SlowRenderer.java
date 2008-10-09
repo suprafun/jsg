@@ -86,7 +86,7 @@ class SlowRenderer {
 			
 			GLState.applyDif(shape);
 	
-			((RetainedVertexData) shape.getVertexData().nativePeer).drawImmidiate(null);
+			((RetainedVertexData) shape.getVertexData().nativePeer).drawImmediate(null);
 		}
 	}
 }
