@@ -273,7 +273,7 @@ class StateSortRenderer {
 			}
 			RenderInfo.visibleShapes++;
 
-			if (!view.isInsideFrustum(peer.worldBoundsCenter, (float) shape.getVertexData().getBoundingSphere().getRadius())) {
+			if (!view.isInsideFrustum(peer.worldBoundsCenter, peer.worldBoundsRadius)) {
 				continue;
 			}
 			RenderInfo.shapesInFrustum++;
@@ -361,7 +361,7 @@ class StateSortRenderer {
 			RenderInfo.visibleShapes++;
 
 			// frustum culling
-			if (!view.isInsideFrustum(peer.worldBoundsCenter, (float) shape.getVertexData().getBoundingSphere().getRadius())) {
+			if (!view.isInsideFrustum(peer.worldBoundsCenter, peer.worldBoundsRadius)) {
 				continue;
 			}
 			RenderInfo.shapesInFrustum++;
@@ -457,7 +457,7 @@ class StateSortRenderer {
 			}
 			RenderInfo.visibleShapes++;
 
-			if (!view.isInsideFrustum(peer.worldBoundsCenter, shape.getVertexData().getBoundingSphere().getRadius())) {
+			if (!view.isInsideFrustum(peer.worldBoundsCenter, peer.worldBoundsRadius)) {
 				continue;
 			}
 			RenderInfo.shapesInFrustum++;
@@ -524,7 +524,7 @@ class StateSortRenderer {
 			}
 			RenderInfo.visibleShapes++;
 
-			if (!view.isInsideFrustum(peer.worldBoundsCenter, (float) shape.getVertexData().getBoundingSphere().getRadius())) {
+			if (!view.isInsideFrustum(peer.worldBoundsCenter, peer.worldBoundsRadius)) {
 				continue;
 			}
 			RenderInfo.shapesInFrustum++;
