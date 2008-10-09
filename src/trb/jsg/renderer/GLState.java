@@ -404,13 +404,15 @@ class GLState {
 			blendEnabled = state.isBlendEnabled();
 			
 			if (blendEnabled) {
-				blendSrcFunc = state.getBlendSrcFunc();
-				blendDstFunc = state.getBlendDstFunc();
 				glEnable(GL_BLEND);
-				glBlendFunc(blendSrcFunc.get(), blendDstFunc.get());
 			} else {
 				glDisable(GL_BLEND);
 			}
+		}
+		if (blendEnabled && (state.getBlendSrcFunc() != blendSrcFunc || state.getBlendDstFunc() != blendDstFunc)) {
+			blendSrcFunc = state.getBlendSrcFunc();
+			blendDstFunc = state.getBlendDstFunc();
+			glBlendFunc(blendSrcFunc.get(), blendDstFunc.get());
 		}
 		
 		if (depthTestEnabled != state.isDepthTestEnabled()) {
@@ -418,13 +420,13 @@ class GLState {
 			
 			if (depthTestEnabled) {
 				glEnable(GL_DEPTH_TEST);
-				if (depthFunc != state.getDepthFunc()) {
-					depthFunc = state.getDepthFunc();
-					glDepthFunc(depthFunc.get());
-				}
 			} else {
 				glDisable(GL_DEPTH_TEST);			
 			}
+		}
+		if (depthTestEnabled && depthFunc != state.getDepthFunc()) {
+			depthFunc = state.getDepthFunc();
+			glDepthFunc(depthFunc.get());
 		}
 		
 		if (depthWriteEnabled != state.isDepthWriteEnabled()) {
@@ -438,17 +440,19 @@ class GLState {
 			// setup cull state
 			if (cullEnabled) {
 				glEnable(GL_CULL_FACE);
-				if (cullFace != state.getCullFace()) {
-					cullFace = state.getCullFace();
-					glCullFace(cullFace.get());
-				}
-				if (frontFace != state.getFrontFace()) {
-					frontFace = state.getFrontFace();
-					glFrontFace(frontFace.get());
-				}
 			} else {
 				glDisable(GL_CULL_FACE);
 			}			
+		}
+		if (cullEnabled) {
+			if (cullFace != state.getCullFace()) {
+				cullFace = state.getCullFace();
+				glCullFace(cullFace.get());
+			}
+			if (frontFace != state.getFrontFace()) {
+				frontFace = state.getFrontFace();
+				glFrontFace(frontFace.get());
+			}
 		}
 		
 		// stencil test
@@ -456,43 +460,45 @@ class GLState {
 			stencilTestEnabled = state.isStencilTestEnabled();
 			if (stencilTestEnabled) {
 				glEnable(GL_STENCIL_TEST);
-				if (stencilFuncFront != state.getStencilFuncFront() 
-						|| stencilRefFront != state.getStencilRefFront()
-						|| stencilMaskFront != state.getStencilMaskFront()) {
-					stencilFuncFront = state.getStencilFuncFront();
-					stencilRefFront = state.getStencilRefFront();
-					stencilMaskFront = state.getStencilMaskFront();
-					glStencilFuncSeparate(GL_FRONT, stencilFuncFront.get(), stencilRefFront, stencilMaskFront);
-				}
-				if (stencilWriteMaskFront != state.getStencilWriteMaskFront()) {
-					stencilWriteMaskFront = state.getStencilWriteMaskFront();
-					glStencilMaskSeparate(GL_FRONT, stencilWriteMaskFront);
-				}
-				if (stencilFailFront != state.getStencilFailFront()
-						|| stencilDepthFailFront != state.getStencilDepthFailFront()
-						|| stencilDepthPassFront != state.getStencilDepthPassFront()) {
-					glStencilOpSeparate(GL_FRONT, stencilFailFront.get(), stencilDepthFailFront.get(), stencilDepthPassFront.get());
-				}
-				
-				if (stencilFuncBack != state.getStencilFuncBack() 
-						|| stencilRefBack != state.getStencilRefBack()
-						|| stencilMaskBack != state.getStencilMaskBack()) {
-					stencilFuncBack = state.getStencilFuncBack();
-					stencilRefBack = state.getStencilRefBack();
-					stencilMaskBack = state.getStencilMaskBack();
-					glStencilFuncSeparate(GL_BACK, stencilFuncBack.get(), stencilRefBack, stencilMaskBack);
-				}
-				if (stencilWriteMaskBack != state.getStencilWriteMaskBack()) {
-					stencilWriteMaskBack = state.getStencilWriteMaskBack();
-					glStencilMaskSeparate(GL_BACK, stencilWriteMaskBack);
-				}
-				if (stencilFailBack != state.getStencilFailBack()
-						|| stencilDepthFailBack != state.getStencilDepthFailBack()
-						|| stencilDepthPassBack != state.getStencilDepthPassBack()) {
-					glStencilOpSeparate(GL_BACK, stencilFailBack.get(), stencilDepthFailBack.get(), stencilDepthPassBack.get());
-				}
 			} else {
 				glDisable(GL_STENCIL_TEST);
+			}
+		}
+		if (stencilTestEnabled) {
+			if (stencilFuncFront != state.getStencilFuncFront() 
+					|| stencilRefFront != state.getStencilRefFront()
+					|| stencilMaskFront != state.getStencilMaskFront()) {
+				stencilFuncFront = state.getStencilFuncFront();
+				stencilRefFront = state.getStencilRefFront();
+				stencilMaskFront = state.getStencilMaskFront();
+				glStencilFuncSeparate(GL_FRONT, stencilFuncFront.get(), stencilRefFront, stencilMaskFront);
+			}
+			if (stencilWriteMaskFront != state.getStencilWriteMaskFront()) {
+				stencilWriteMaskFront = state.getStencilWriteMaskFront();
+				glStencilMaskSeparate(GL_FRONT, stencilWriteMaskFront);
+			}
+			if (stencilFailFront != state.getStencilFailFront()
+					|| stencilDepthFailFront != state.getStencilDepthFailFront()
+					|| stencilDepthPassFront != state.getStencilDepthPassFront()) {
+				glStencilOpSeparate(GL_FRONT, stencilFailFront.get(), stencilDepthFailFront.get(), stencilDepthPassFront.get());
+			}
+			
+			if (stencilFuncBack != state.getStencilFuncBack() 
+					|| stencilRefBack != state.getStencilRefBack()
+					|| stencilMaskBack != state.getStencilMaskBack()) {
+				stencilFuncBack = state.getStencilFuncBack();
+				stencilRefBack = state.getStencilRefBack();
+				stencilMaskBack = state.getStencilMaskBack();
+				glStencilFuncSeparate(GL_BACK, stencilFuncBack.get(), stencilRefBack, stencilMaskBack);
+			}
+			if (stencilWriteMaskBack != state.getStencilWriteMaskBack()) {
+				stencilWriteMaskBack = state.getStencilWriteMaskBack();
+				glStencilMaskSeparate(GL_BACK, stencilWriteMaskBack);
+			}
+			if (stencilFailBack != state.getStencilFailBack()
+					|| stencilDepthFailBack != state.getStencilDepthFailBack()
+					|| stencilDepthPassBack != state.getStencilDepthPassBack()) {
+				glStencilOpSeparate(GL_BACK, stencilFailBack.get(), stencilDepthFailBack.get(), stencilDepthPassBack.get());
 			}
 		}
 		
@@ -501,30 +507,32 @@ class GLState {
 			alphaTestEnabled = state.isAlphaTestEnabled();
 			if (alphaTestEnabled) {
 				glEnable(GL_ALPHA_TEST);
-				if (alphaTestFunc != state.getAlphaTestFunc() 
-						|| alphaTestRef != state.getAlphaTestRef()) {
-					alphaTestFunc = state.getAlphaTestFunc();
-					alphaTestRef = state.getAlphaTestRef();
-					glAlphaFunc(alphaTestFunc.get(), alphaTestRef);
-				}
 			} else {
 				glDisable(GL_ALPHA_TEST);
 			}
 		}
-
+		if (alphaTestEnabled 
+				&& (alphaTestFunc != state.getAlphaTestFunc() 
+					|| alphaTestRef != state.getAlphaTestRef())) {
+			alphaTestFunc = state.getAlphaTestFunc();
+			alphaTestRef = state.getAlphaTestRef();
+			glAlphaFunc(alphaTestFunc.get(), alphaTestRef);
+		}
+		
 		if (polygonOffsetFillEnabled != state.polygonOffsetFillEnabled) {
 			polygonOffsetFillEnabled = state.polygonOffsetFillEnabled;
 			if (polygonOffsetFillEnabled) {
 				glEnable(GL_POLYGON_OFFSET_FILL);
-				if (polygonOffsetFactor != state.polygonOffsetFactor
-						|| polygonOffsetUnits != state.polygonOffsetUnits) {
-					polygonOffsetFactor = state.polygonOffsetFactor;
-					polygonOffsetUnits = state.polygonOffsetUnits;
-					glPolygonOffset(polygonOffsetFactor, polygonOffsetUnits);
-				}
 			} else {
 				glDisable(GL_POLYGON_OFFSET_FILL);
 			}
+		}
+		if (polygonOffsetFillEnabled 
+				&& (polygonOffsetFactor != state.polygonOffsetFactor
+					|| polygonOffsetUnits != state.polygonOffsetUnits)) {
+			polygonOffsetFactor = state.polygonOffsetFactor;
+			polygonOffsetUnits = state.polygonOffsetUnits;
+			glPolygonOffset(polygonOffsetFactor, polygonOffsetUnits);
 		}
 
 		if (isMaterialSet != (state.getMaterial() != null)) {
