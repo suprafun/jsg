@@ -41,6 +41,7 @@ import javax.vecmath.Point3f;
 import org.lwjgl.opengl.GL11;
 
 import trb.jsg.BoundingBox;
+import trb.jsg.BoundingSphere;
 import trb.jsg.Shader;
 import trb.jsg.Shape;
 import trb.jsg.Texture;
@@ -98,6 +99,9 @@ class RetainedShape implements ShapePeer {
 	/** The center of the bounding sphere in world space */
 	public Point3f worldBoundsCenter = new Point3f();
 	
+	/** The radius of the bounding sphere in world space. This includes scale. */
+	public float worldBoundsRadius = 0;
+	
 	public BoundingBox worldBBox = null;
 	
 
@@ -114,8 +118,11 @@ class RetainedShape implements ShapePeer {
 	 * Updates the worldBoundsCenter member.
 	 */
 	public void updateWorldBoundsCenter() {
-		worldBoundsCenter.set(shape.getVertexData().getBoundingSphere().getCenter());
+		BoundingSphere sphere = shape.getVertexData().getBoundingSphere();
+		worldBoundsCenter.set(sphere.getCenter());
 		shape.getModelMatrix().transform(worldBoundsCenter);
+		worldBoundsRadius = sphere.getRadius();
+		worldBoundsRadius *= shape.getModelMatrix().getScale();
 	}
 	
 	/**
