@@ -55,7 +55,8 @@ import trb.jsg.enums.*;
 import trb.jsg.util.GLUtils;
 
 /**
- * Wraps the OpenGL state.
+ * Wraps the OpenGL state. A diff can be used to only apply the state that has 
+ * changed.
  * 
  * @author tombr
  *
@@ -146,33 +147,40 @@ class GLState {
 	}
 	
 	/**
-	 * Apply the light state
+	 * Apply the light state.
 	 * @param lightState the light state to apply
 	 */
 	public static void applyLights(LightState lightState) {
 		for (int i=0; i<lightEnabled.length; i++) {
 			if (lightEnabled[i] != (lightState.lights.get(i) != null)) {
 				lightEnabled[i] = (lightState.lights.get(i) != null);
-				if (lightEnabled[i]) {
-					glEnable(GL_LIGHT0+i);
-					LightState.Light light = lightState.lights.get(i);
-					setLightProperty(i, GL_AMBIENT, light.ambient.x, light.ambient.y, light.ambient.z, 1);
-					setLightProperty(i, GL_DIFFUSE, light.diffuse.x, light.diffuse.y, light.diffuse.z, 1);
-					setLightProperty(i, GL_SPECULAR, light.specular.x, light.specular.y, light.specular.z, 1);
-					setLightProperty(i, GL_POSITION, light.position.x, light.position.y, light.position.z, light.position.w);
-					setLightProperty(i, GL_SPOT_DIRECTION, light.spotDirection.x, light.spotDirection.y, light.spotDirection.z, 1);
-					setLightProperty(i, GL_SPOT_EXPONENT, light.spotExponent, 0, 0, 0);
-					setLightProperty(i, GL_SPOT_CUTOFF, light.spotCutoff, 0, 0, 0);
-					setLightProperty(i, GL_CONSTANT_ATTENUATION, light.constantAttenuation, 0, 0, 0);
-					setLightProperty(i, GL_LINEAR_ATTENUATION, light.linearAttenuation, 0, 0, 0);
-					setLightProperty(i, GL_QUADRATIC_ATTENUATION, light.quadratiqAttenuation, 0, 0, 0);
-				} else {
-					glDisable(GL_LIGHT0+i);
-				}
+				setEnable(GL_LIGHT0+i, lightEnabled[i]);
+			}
+			if (lightEnabled[i]) {
+				LightState.Light light = lightState.lights.get(i);
+				setLightProperty(i, GL_AMBIENT, light.ambient.x, light.ambient.y, light.ambient.z, 1);
+				setLightProperty(i, GL_DIFFUSE, light.diffuse.x, light.diffuse.y, light.diffuse.z, 1);
+				setLightProperty(i, GL_SPECULAR, light.specular.x, light.specular.y, light.specular.z, 1);
+				setLightProperty(i, GL_POSITION, light.position.x, light.position.y, light.position.z, light.position.w);
+				setLightProperty(i, GL_SPOT_DIRECTION, light.spotDirection.x, light.spotDirection.y, light.spotDirection.z, 1);
+				setLightProperty(i, GL_SPOT_EXPONENT, light.spotExponent, 0, 0, 0);
+				setLightProperty(i, GL_SPOT_CUTOFF, light.spotCutoff, 0, 0, 0);
+				setLightProperty(i, GL_CONSTANT_ATTENUATION, light.constantAttenuation, 0, 0, 0);
+				setLightProperty(i, GL_LINEAR_ATTENUATION, light.linearAttenuation, 0, 0, 0);
+				setLightProperty(i, GL_QUADRATIC_ATTENUATION, light.quadratiqAttenuation, 0, 0, 0);
 			}
 		}
 	}
 
+	/**
+	 * Sets a light property.
+	 * @param lightIdx zero based index into lights
+	 * @param pname name of property
+	 * @param x the first parameter
+	 * @param y the second parameter
+	 * @param z the third parameter
+	 * @param w the fourth parameter
+	 */
 	private static void setLightProperty(int lightIdx, int pname, float x, float y, float z, float w) {
 		colorBuffer.put(0, x);
 		colorBuffer.put(1, y);
@@ -183,9 +191,9 @@ class GLState {
 	
 
 	/**
-	 * Checks if the shape has the same state as the previous applyed shape.
+	 * Checks if the shape has the same state as the previous applied shape.
 	 * @param shape the shape to test
-	 * @return true if shape is equal to the previously applyed shape
+	 * @return true if shape is equal to the previously applied shape
 	 */
 	public static boolean isEqual(Shape shape) {
 		if (!RetainedSceneGraph.SAFE_MODE && (prevShape != null) 
@@ -196,6 +204,10 @@ class GLState {
 		return false;
 	}
 
+	/**
+	 * Applies the shapes state. All state are set even if the do not change.
+	 * @param shape contains the state to set
+	 */
 	public static void apply(Shape shape) {
 		State state = shape.getState();
 		currentProgram = ((RetainedShader) state.getShader().getShaderProgram().nativePeer).programId;
@@ -353,6 +365,11 @@ class GLState {
 		Util.checkGLError();
 	}
 	
+	/**
+	 * Sets the front and back material 3 component color.
+	 * @param pname name of the material property
+	 * @param color the color to set
+	 */
 	private static void setMaterialColor(int pname, Color3f color) {
 		colorBuffer.put(0, color.x);
 		colorBuffer.put(1, color.y);
@@ -361,6 +378,11 @@ class GLState {
 		glMaterial(GL_FRONT_AND_BACK, pname, colorBuffer);
 	}
 	
+	/**
+	 * Sets the front and back material 4 component color.
+	 * @param pname name of the material property
+	 * @param color the color to set
+	 */
 	private static void setMaterialColor(int pname, Color4f color) {
 		colorBuffer.put(0, color.x);
 		colorBuffer.put(1, color.y);
@@ -369,6 +391,11 @@ class GLState {
 		glMaterial(GL_FRONT_AND_BACK, pname, colorBuffer);
 	}
 	
+	/**
+	 * Enables or disables the specified state.
+	 * @param flag the OpenGL id of the state (Example: GL_DEPTH_TEST, GL_ALPHA_TEST) 
+	 * @param value true to enable, false to disable
+	 */
 	private static void setEnable(int flag, boolean value) {
 		if (value) {
 			glEnable(flag);
@@ -378,8 +405,8 @@ class GLState {
 	}
 
 	/**
-	 * 
-	 * @param shape
+	 * Applies the shapes state by only setting the state that has changed. 
+	 * @param shape contains the shape to set
 	 */
 	public static void applyDif(Shape shape) {
 		if (RetainedSceneGraph.SAFE_MODE) {
@@ -390,6 +417,7 @@ class GLState {
 		prevShape = shape;
 		State state = shape.getState();
 		
+		// shader program
 		if (state.getShader() != null) {
 			RetainedShader simpleShaderPeer = (RetainedShader) state.getShader().getShaderProgram().nativePeer;
 			int shapeShaderId = simpleShaderPeer.programId;
@@ -400,49 +428,37 @@ class GLState {
 		}
 		Util.checkGLError();
 		
+		// blend
 		if (blendEnabled != state.isBlendEnabled()) {
 			blendEnabled = state.isBlendEnabled();
-			
-			if (blendEnabled) {
-				glEnable(GL_BLEND);
-			} else {
-				glDisable(GL_BLEND);
-			}
+			setEnable(GL_BLEND, blendEnabled);
 		}
 		if (blendEnabled && (state.getBlendSrcFunc() != blendSrcFunc || state.getBlendDstFunc() != blendDstFunc)) {
 			blendSrcFunc = state.getBlendSrcFunc();
 			blendDstFunc = state.getBlendDstFunc();
 			glBlendFunc(blendSrcFunc.get(), blendDstFunc.get());
 		}
-		
+
+		// depth test
 		if (depthTestEnabled != state.isDepthTestEnabled()) {
 			depthTestEnabled = state.isDepthTestEnabled();
-			
-			if (depthTestEnabled) {
-				glEnable(GL_DEPTH_TEST);
-			} else {
-				glDisable(GL_DEPTH_TEST);			
-			}
+			setEnable(GL_DEPTH_TEST, depthTestEnabled);
 		}
 		if (depthTestEnabled && depthFunc != state.getDepthFunc()) {
 			depthFunc = state.getDepthFunc();
 			glDepthFunc(depthFunc.get());
-		}
+		}		
 		
+		// depth mask
 		if (depthWriteEnabled != state.isDepthWriteEnabled()) {
 			depthWriteEnabled = state.isDepthWriteEnabled();
 			glDepthMask(depthWriteEnabled);			
 		}
-		
+
+		// cull and front face
 		if (cullEnabled != state.isCullEnabled()) {
 			cullEnabled = state.isCullEnabled();
-			
-			// setup cull state
-			if (cullEnabled) {
-				glEnable(GL_CULL_FACE);
-			} else {
-				glDisable(GL_CULL_FACE);
-			}			
+			setEnable(GL_CULL_FACE, cullEnabled);
 		}
 		if (cullEnabled) {
 			if (cullFace != state.getCullFace()) {
@@ -458,13 +474,10 @@ class GLState {
 		// stencil test
 		if (stencilTestEnabled != state.isStencilTestEnabled()) {
 			stencilTestEnabled = state.isStencilTestEnabled();
-			if (stencilTestEnabled) {
-				glEnable(GL_STENCIL_TEST);
-			} else {
-				glDisable(GL_STENCIL_TEST);
-			}
+			setEnable(GL_STENCIL_TEST, stencilTestEnabled);
 		}
 		if (stencilTestEnabled) {
+			// front
 			if (stencilFuncFront != state.getStencilFuncFront() 
 					|| stencilRefFront != state.getStencilRefFront()
 					|| stencilMaskFront != state.getStencilMaskFront()) {
@@ -483,6 +496,7 @@ class GLState {
 				glStencilOpSeparate(GL_FRONT, stencilFailFront.get(), stencilDepthFailFront.get(), stencilDepthPassFront.get());
 			}
 			
+			// back
 			if (stencilFuncBack != state.getStencilFuncBack() 
 					|| stencilRefBack != state.getStencilRefBack()
 					|| stencilMaskBack != state.getStencilMaskBack()) {
@@ -505,11 +519,7 @@ class GLState {
 		// alpha test
 		if (alphaTestEnabled != state.isAlphaTestEnabled()) {
 			alphaTestEnabled = state.isAlphaTestEnabled();
-			if (alphaTestEnabled) {
-				glEnable(GL_ALPHA_TEST);
-			} else {
-				glDisable(GL_ALPHA_TEST);
-			}
+			setEnable(GL_ALPHA_TEST, alphaTestEnabled);
 		}
 		if (alphaTestEnabled 
 				&& (alphaTestFunc != state.getAlphaTestFunc() 
@@ -518,14 +528,11 @@ class GLState {
 			alphaTestRef = state.getAlphaTestRef();
 			glAlphaFunc(alphaTestFunc.get(), alphaTestRef);
 		}
-		
+
+		// polygon offset
 		if (polygonOffsetFillEnabled != state.polygonOffsetFillEnabled) {
 			polygonOffsetFillEnabled = state.polygonOffsetFillEnabled;
-			if (polygonOffsetFillEnabled) {
-				glEnable(GL_POLYGON_OFFSET_FILL);
-			} else {
-				glDisable(GL_POLYGON_OFFSET_FILL);
-			}
+			setEnable(GL_POLYGON_OFFSET_FILL, polygonOffsetFillEnabled);
 		}
 		if (polygonOffsetFillEnabled 
 				&& (polygonOffsetFactor != state.polygonOffsetFactor
@@ -535,11 +542,13 @@ class GLState {
 			glPolygonOffset(polygonOffsetFactor, polygonOffsetUnits);
 		}
 
+		// enable lighting if material is set
 		if (isMaterialSet != (state.getMaterial() != null)) {
 			isMaterialSet = (state.getMaterial() != null);
 			setEnable(GL_LIGHTING, isMaterialSet);
 		}
 		
+		// material
 		if (isMaterialSet) {
 			State.Material m = state.getMaterial();
 			if (!material.getAmbientColor().equals(m.getAmbientColor())) {
@@ -562,10 +571,9 @@ class GLState {
 				material.setShininess(m.getShininess());
 				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, material.getShininess());
 			}
-		} else {
-			glDisable(GL_LIGHTING);
 		}
 		
+		// texture units
 		for (int unitIdx=0; unitIdx<glUnits.length; unitIdx++) {
 			TextureUnitState glUnit = glUnits[unitIdx];
 			Unit shapeUnit = state.getUnit(unitIdx);
@@ -573,158 +581,179 @@ class GLState {
 				shapeUnit = Unit.disabledUnit;
 			}
 			
-			if (shapeUnit.isEnabled()) {
-				if (!glUnit.enabled) {
-					glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
-					glEnable(shapeUnit.getTexture().getType().get());					
-					glUnit.enabled = true;
-					glUnit.enabledType = shapeUnit.getTexture().getType().get();
-				} else if (shapeUnit.getTexture().getType().get() != glUnit.enabledType) {
-					glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
-					glDisable(glUnit.enabledType);					
-					glEnable(shapeUnit.getTexture().getType().get());
-					glUnit.enabledType = shapeUnit.getTexture().getType().get();
-				}
-				
-				if (shapeUnit.getTexture().nativePeer == null) {
-					System.err.println("texture peer is null "+unitIdx+" "+shapeUnit.getTexture());
-					Thread.dumpStack();
-					System.exit(0);
-				}
-				
-				int textureId = ((RetainedTexture) shapeUnit.getTexture().nativePeer).getTextureId(); 
-				if (textureId != glUnit.bindId) {
-					glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
-					glBindTexture(shapeUnit.getTexture().getType().get(), textureId);
-					glUnit.bindId = textureId;
-				}
-				if (shapeUnit.getTextureEnvMode().get() != glUnit.envMode) {
-					glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
-					glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, shapeUnit.getTextureEnvMode().get());
-					glUnit.envMode = shapeUnit.getTextureEnvMode().get();
-				}
-
-				if (shapeUnit.getTextureEnvMode() == TextureEnvMode.COMBINE) {
-					glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
-					if (shapeUnit.getCombineFuncRGB().get() != glUnit.combineFuncRGB) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, shapeUnit.getCombineFuncRGB().get());
-						glUnit.combineFuncRGB = shapeUnit.getCombineFuncRGB().get(); 
-					}
-					if (shapeUnit.getCombineFuncAlpha().get() != glUnit.combineFuncAlpha) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, shapeUnit.getCombineFuncAlpha().get());
-						glUnit.combineFuncAlpha = shapeUnit.getCombineFuncAlpha().get(); 
-					}
-					if (shapeUnit.getCombineSrc0RGB().get() != glUnit.combineSrc0RGB) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, shapeUnit.getCombineSrc0RGB().get());
-						glUnit.combineSrc0RGB = shapeUnit.getCombineSrc0RGB().get(); 
-					}
-					if (shapeUnit.getCombineSrc1RGB().get() != glUnit.combineSrc1RGB) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, shapeUnit.getCombineSrc1RGB().get());
-						glUnit.combineSrc1RGB = shapeUnit.getCombineSrc1RGB().get(); 
-					}
-					if (shapeUnit.getCombineSrc2RGB().get() != glUnit.combineSrc2RGB) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, shapeUnit.getCombineSrc2RGB().get());
-						glUnit.combineSrc2RGB = shapeUnit.getCombineSrc2RGB().get(); 
-					}
-					if (shapeUnit.getCombineSrc0Alpha().get() != glUnit.combineSrc0Alpha) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, shapeUnit.getCombineSrc0Alpha().get());
-						glUnit.combineSrc0Alpha = shapeUnit.getCombineSrc0Alpha().get(); 
-					}
-					if (shapeUnit.getCombineSrc1Alpha().get() != glUnit.combineSrc1Alpha) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, shapeUnit.getCombineSrc1Alpha().get());
-						glUnit.combineSrc1Alpha = shapeUnit.getCombineSrc1Alpha().get(); 
-					}
-					if (shapeUnit.getCombineSrc2Alpha().get() != glUnit.combineSrc2Alpha) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, shapeUnit.getCombineSrc2Alpha().get());
-						glUnit.combineSrc2Alpha = shapeUnit.getCombineSrc2Alpha().get(); 
-					}
-					if (shapeUnit.getCombineOperand0RGB().get() != glUnit.combineOperand0RGB) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, shapeUnit.getCombineOperand0RGB().get());
-						glUnit.combineOperand0RGB = shapeUnit.getCombineOperand0RGB().get(); 
-					}
-					if (shapeUnit.getCombineOperand1RGB().get() != glUnit.combineOperand1RGB) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, shapeUnit.getCombineOperand1RGB().get());
-						glUnit.combineOperand1RGB = shapeUnit.getCombineOperand1RGB().get(); 
-					}
-					if (shapeUnit.getCombineOperand2RGB().get() != glUnit.combineOperand2RGB) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, shapeUnit.getCombineOperand2RGB().get());
-						glUnit.combineOperand2RGB = shapeUnit.getCombineOperand2RGB().get(); 
-					}
-					if (shapeUnit.getCombineOperand0Alpha().get() != glUnit.combineOperand0Alpha) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, shapeUnit.getCombineOperand0Alpha().get());
-						glUnit.combineOperand0Alpha = shapeUnit.getCombineOperand0Alpha().get(); 
-					}
-					if (shapeUnit.getCombineOperand1Alpha().get() != glUnit.combineOperand1Alpha) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, shapeUnit.getCombineOperand2Alpha().get());
-						glUnit.combineOperand1Alpha = shapeUnit.getCombineOperand1Alpha().get(); 
-					}
-					if (shapeUnit.getCombineOperand2Alpha().get() != glUnit.combineOperand2Alpha) {
-						glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA, shapeUnit.getCombineOperand2Alpha().get());
-						glUnit.combineOperand2Alpha = shapeUnit.getCombineOperand2Alpha().get(); 
-					}
-					if (shapeUnit.getCombineScaleRGB().get() != glUnit.combineScaleRGB) {
-						glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, shapeUnit.getCombineScaleRGB().get());
-						glUnit.combineScaleRGB = shapeUnit.getCombineScaleRGB().get(); 
-					}
-					if (shapeUnit.getCombineScaleAlpha().get() != glUnit.combineScaleAlpha) {
-						glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, shapeUnit.getCombineScaleAlpha().get());
-						glUnit.combineScaleAlpha = shapeUnit.getCombineScaleAlpha().get(); 
-					}
-				}
-				
-				// texture generation
-				for (int i=0; i<4; i++) {
-					TextureCoordinate coord = TextureCoordinate.COORDS[i];
-					int texGenMode = shapeUnit.getTexGenMode(coord).get();
-					if (shapeUnit.isTexGenEnabled(coord)) {
-						if (!glUnit.textureGen[i]) {
-							glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
-							glEnable(GL_TEXTURE_GEN_S+i);
-							glUnit.textureGen[i] = true;
-						}
-						if (texGenMode != glUnit.textureGenMode[i]) {
-							glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
-							glTexGeni(GL_S+i, GL_TEXTURE_GEN_MODE, texGenMode);
-							glUnit.textureGenMode[i] = texGenMode;
-						}
-					} else {
-						if (glUnit.textureGen[i]) {
-							glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
-							glDisable(GL_TEXTURE_GEN_S+i);
-							glUnit.textureGen[i] = false;
-						}
-					}
-				}
-			} else {
-				if (glUnit.enabled) {
-					glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
-					glDisable(glUnit.enabledType);
-					glUnit.enabled = false;
-				}
-			}
+			applyTextureUnitDif(glUnit, shapeUnit, unitIdx);
 		}
 		Util.checkGLError();
 	}
+	/**
+	 * Applies the shapes state by only setting the state that has changed. 
+	 * @param shape contains the shape to set
+	 */
 	
-	public static void applyUniforms(RetainedShader simpleShaderPeer, State state) {
-		Shader uniformSet = state.getShader();
-//		System.out.println("applyUniforms "+currentProgram+" "+uniformSet
-//				+" "+simpleShaderPeer.currentUniformSet
-//				+" "+uniformSet.changeFrameIdx +" "+ simpleShaderPeer.currentUniformSetFrameIdx);
-		if (currentProgram != 0 && uniformSet != null && 
-				(simpleShaderPeer.currentUniformSet != uniformSet
-				|| uniformSet.changeFrameIdx > simpleShaderPeer.currentUniformSetFrameIdx)) {
-			// upload uniforms
-			simpleShaderPeer.currentUniformSet = uniformSet;
-			simpleShaderPeer.currentUniformSetFrameIdx = Renderer.frameIdx;
-			Uniform[] uniforms = uniformSet.getAllUniforms();
-			for (Uniform uniform : uniforms) {
-				simpleShaderPeer.setUniform(uniform);
+	/**
+	 * Applies the specified texture unit state.  
+	 * @param glUnit the current unit state
+	 * @param shapeUnit the shape unit state to set
+	 * @param unitIdx the index of the unit
+	 */
+	private static void applyTextureUnitDif(TextureUnitState glUnit, Unit shapeUnit, int unitIdx) {
+		if (shapeUnit.isEnabled()) {
+			if (!glUnit.enabled) {
+				glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
+				glEnable(shapeUnit.getTexture().getType().get());					
+				glUnit.enabled = true;
+				glUnit.enabledType = shapeUnit.getTexture().getType().get();
+			} else if (shapeUnit.getTexture().getType().get() != glUnit.enabledType) {
+				glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
+				glDisable(glUnit.enabledType);					
+				glEnable(shapeUnit.getTexture().getType().get());
+				glUnit.enabledType = shapeUnit.getTexture().getType().get();
 			}
-//			System.out.println("applyUniforms "+currentProgram);
+			
+			if (shapeUnit.getTexture().nativePeer == null) {
+				System.err.println("texture peer is null "+unitIdx+" "+shapeUnit.getTexture());
+				Thread.dumpStack();
+				System.exit(0);
+			}
+			
+			int textureId = ((RetainedTexture) shapeUnit.getTexture().nativePeer).getTextureId(); 
+			if (textureId != glUnit.bindId) {
+				glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
+				glBindTexture(shapeUnit.getTexture().getType().get(), textureId);
+				glUnit.bindId = textureId;
+			}
+			if (shapeUnit.getTextureEnvMode().get() != glUnit.envMode) {
+				glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
+				glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, shapeUnit.getTextureEnvMode().get());
+				glUnit.envMode = shapeUnit.getTextureEnvMode().get();
+			}
+
+			if (shapeUnit.getTextureEnvMode() == TextureEnvMode.COMBINE) {
+				glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
+				if (shapeUnit.getCombineFuncRGB().get() != glUnit.combineFuncRGB) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, shapeUnit.getCombineFuncRGB().get());
+					glUnit.combineFuncRGB = shapeUnit.getCombineFuncRGB().get(); 
+				}
+				if (shapeUnit.getCombineFuncAlpha().get() != glUnit.combineFuncAlpha) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, shapeUnit.getCombineFuncAlpha().get());
+					glUnit.combineFuncAlpha = shapeUnit.getCombineFuncAlpha().get(); 
+				}
+				if (shapeUnit.getCombineSrc0RGB().get() != glUnit.combineSrc0RGB) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, shapeUnit.getCombineSrc0RGB().get());
+					glUnit.combineSrc0RGB = shapeUnit.getCombineSrc0RGB().get(); 
+				}
+				if (shapeUnit.getCombineSrc1RGB().get() != glUnit.combineSrc1RGB) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB, shapeUnit.getCombineSrc1RGB().get());
+					glUnit.combineSrc1RGB = shapeUnit.getCombineSrc1RGB().get(); 
+				}
+				if (shapeUnit.getCombineSrc2RGB().get() != glUnit.combineSrc2RGB) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB, shapeUnit.getCombineSrc2RGB().get());
+					glUnit.combineSrc2RGB = shapeUnit.getCombineSrc2RGB().get(); 
+				}
+				if (shapeUnit.getCombineSrc0Alpha().get() != glUnit.combineSrc0Alpha) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, shapeUnit.getCombineSrc0Alpha().get());
+					glUnit.combineSrc0Alpha = shapeUnit.getCombineSrc0Alpha().get(); 
+				}
+				if (shapeUnit.getCombineSrc1Alpha().get() != glUnit.combineSrc1Alpha) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, shapeUnit.getCombineSrc1Alpha().get());
+					glUnit.combineSrc1Alpha = shapeUnit.getCombineSrc1Alpha().get(); 
+				}
+				if (shapeUnit.getCombineSrc2Alpha().get() != glUnit.combineSrc2Alpha) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA, shapeUnit.getCombineSrc2Alpha().get());
+					glUnit.combineSrc2Alpha = shapeUnit.getCombineSrc2Alpha().get(); 
+				}
+				if (shapeUnit.getCombineOperand0RGB().get() != glUnit.combineOperand0RGB) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB, shapeUnit.getCombineOperand0RGB().get());
+					glUnit.combineOperand0RGB = shapeUnit.getCombineOperand0RGB().get(); 
+				}
+				if (shapeUnit.getCombineOperand1RGB().get() != glUnit.combineOperand1RGB) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB, shapeUnit.getCombineOperand1RGB().get());
+					glUnit.combineOperand1RGB = shapeUnit.getCombineOperand1RGB().get(); 
+				}
+				if (shapeUnit.getCombineOperand2RGB().get() != glUnit.combineOperand2RGB) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB, shapeUnit.getCombineOperand2RGB().get());
+					glUnit.combineOperand2RGB = shapeUnit.getCombineOperand2RGB().get(); 
+				}
+				if (shapeUnit.getCombineOperand0Alpha().get() != glUnit.combineOperand0Alpha) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, shapeUnit.getCombineOperand0Alpha().get());
+					glUnit.combineOperand0Alpha = shapeUnit.getCombineOperand0Alpha().get(); 
+				}
+				if (shapeUnit.getCombineOperand1Alpha().get() != glUnit.combineOperand1Alpha) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, shapeUnit.getCombineOperand2Alpha().get());
+					glUnit.combineOperand1Alpha = shapeUnit.getCombineOperand1Alpha().get(); 
+				}
+				if (shapeUnit.getCombineOperand2Alpha().get() != glUnit.combineOperand2Alpha) {
+					glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA, shapeUnit.getCombineOperand2Alpha().get());
+					glUnit.combineOperand2Alpha = shapeUnit.getCombineOperand2Alpha().get(); 
+				}
+				if (shapeUnit.getCombineScaleRGB().get() != glUnit.combineScaleRGB) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_RGB_SCALE, shapeUnit.getCombineScaleRGB().get());
+					glUnit.combineScaleRGB = shapeUnit.getCombineScaleRGB().get(); 
+				}
+				if (shapeUnit.getCombineScaleAlpha().get() != glUnit.combineScaleAlpha) {
+					glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, shapeUnit.getCombineScaleAlpha().get());
+					glUnit.combineScaleAlpha = shapeUnit.getCombineScaleAlpha().get(); 
+				}
+			}
+			
+			// texture generation
+			for (int i=0; i<4; i++) {
+				TextureCoordinate coord = TextureCoordinate.COORDS[i];
+				if (shapeUnit.isTexGenEnabled(coord)) {
+					if (!glUnit.textureGen[i]) {
+						glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
+						glEnable(GL_TEXTURE_GEN_S+i);
+						glUnit.textureGen[i] = true;
+					}
+					int texGenMode = shapeUnit.getTexGenMode(coord).get();
+					if (texGenMode != glUnit.textureGenMode[i]) {
+						glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
+						glTexGeni(GL_S+i, GL_TEXTURE_GEN_MODE, texGenMode);
+						glUnit.textureGenMode[i] = texGenMode;
+					}
+				} else {
+					if (glUnit.textureGen[i]) {
+						glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
+						glDisable(GL_TEXTURE_GEN_S+i);
+						glUnit.textureGen[i] = false;
+					}
+				}
+			}
+		} else {
+			if (glUnit.enabled) {
+				glActiveTextureWrapper(GL_TEXTURE0 + unitIdx);
+				glDisable(glUnit.enabledType);
+				glUnit.enabled = false;
+			}
 		}
 	}
+//	RetainedShader simpleShaderPeer = (RetainedShader) shape.getState().getShader().getShaderProgram().nativePeer;
+//	GLState.applyUniforms(simpleShaderPeer, shape.getState());
 	
+	/**
+	 * Applies the shapes shader uniforms.
+	 * @param shape the shape containing the uniforms to set
+	 */
+	public static void applyUniforms(Shape shape) {
+		Shader shader = shape.getState().getShader();
+		RetainedShader simpleShaderProgramPeer = (RetainedShader) shader.getShaderProgram().nativePeer;
+		if (currentProgram != 0 && shader != null && 
+			(simpleShaderProgramPeer.currentUniformSet != shader
+			|| shader.changeFrameIdx > simpleShaderProgramPeer.currentUniformSetFrameIdx)) {
+			// upload uniforms
+			simpleShaderProgramPeer.currentUniformSet = shader;
+			simpleShaderProgramPeer.currentUniformSetFrameIdx = Renderer.frameIdx;
+			Uniform[] uniforms = shader.getAllUniforms();
+			for (Uniform uniform : uniforms) {
+				simpleShaderProgramPeer.setUniform(uniform);
+			}
+		}
+	}
+
+	/**
+	 * Lazy sets glActiveTexture to the texture unit with the specified id.
+	 * @param id the id of the texture unit to set
+	 */
 	public static void glActiveTextureWrapper(int id) {
 		if (id != activeTexture) {
 			activeTexture = id;
@@ -732,6 +761,11 @@ class GLState {
 		}
 	}
 	
+	/**
+	 * Lazy binds a texture on the active texture unit.
+	 * @param target the target (Example: GL_TEXTURE_2D)
+	 * @param id the texture id to bind
+	 */
 	public static void glBindTextureWrapper(int target, int id) {
 		int unitIdx = activeTexture - GL_TEXTURE0;
 		TextureUnitState unit = glUnits[unitIdx];
@@ -746,9 +780,10 @@ class GLState {
 	}
 
 	/**
-	 * Checks if the state matches the opengl state.
+	 * Checks if the cached state matches the opengl state.
 	 */
 	public static void validateState() {
+		// TODO: check lights and material
 		Util.checkGLError(); 
 		checkInt(GL_CURRENT_PROGRAM, currentProgram, "GL_CURRENT_PROGRAM");
 		checkEnabled(GL_CULL_FACE, cullEnabled, "GL_CULL_FACE");
@@ -835,8 +870,10 @@ class GLState {
 	}
 	
 	/**
-	 * Checks if a flag matches.
+	 * Checks if the cached flag matches OpenGL.
 	 * @param cap Specifies a symbolic constant indicating a GL capability.
+	 * @param value the cached state
+	 * @param name name of capability. Is printed if state don't match.
 	 */
 	private static void checkEnabled(int cap, boolean value, String name) {
 		if (glIsEnabled(cap) != value) {
@@ -844,6 +881,12 @@ class GLState {
 		}		
 	}
 
+	/**
+	 * Checks if the cached int matches OpenGL.
+	 * @param cap Specifies a symbolic constant indicating a GL capability.
+	 * @param value the cached state
+	 * @param name name of capability. Is printed if state don't match.
+	 */
 	private static int checkInt(int cap, int value, String name) {
 		int actual = GLUtils.getInteger(cap);
 		if (value != actual) {
@@ -853,6 +896,12 @@ class GLState {
 		return value;
 	}
 
+	/**
+	 * Checks if the cached float matches OpenGL.
+	 * @param cap Specifies a symbolic constant indicating a GL capability.
+	 * @param value the cached state
+	 * @param name name of capability. Is printed if state don't match.
+	 */
 	private static float checkFloat(int cap, float value, String name) {
 		float actual = GLUtils.getFloat(cap);
 		if (value != actual) {
@@ -862,7 +911,12 @@ class GLState {
 		return value;
 	}
 
-	
+	/**
+	 * Checks if the cached texEnv matches OpenGL.
+	 * @param cap Specifies a symbolic constant indicating a GL capability.
+	 * @param value the cached state
+	 * @param name name of capability. Is printed if state don't match.
+	 */
 	private static int checkTexEnv(int cap, int value, String name) {
 		int actual = GLUtils.getTexEnv(cap);
 		if (value != actual) {
