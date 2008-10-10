@@ -345,8 +345,7 @@ class RetainedShape implements ShapePeer {
 	 */
 	public void draw() {
 		if (shape.getState().getShader() != null) {
-			RetainedShader simpleShaderPeer = (RetainedShader) shape.getState().getShader().getShaderProgram().nativePeer;
-			GLState.applyUniforms(simpleShaderPeer, shape.getState());
+			GLState.applyUniforms(shape);
 		}
 		
 		switch (renderType) {
