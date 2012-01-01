@@ -40,7 +40,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
-import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 
 import org.lwjgl.BufferUtils;
@@ -170,8 +169,7 @@ public class VertexData implements Serializable {
 //		boundingBox = new BoundingBox(new Point3d(lower), new Point3d(upper));
 
 		Point3f center = new Point3f();
-		center.add(lower, upper);
-		center.scale(0.5f);
+        center.interpolate(lower, upper, 0.5f);
 		boundingSphere = new BoundingSphere(center, 0.0000001f);
 		Point3f currentP3d = new Point3f();
 		for (int vertexOff=0; vertexOff<coordinates.limit(); vertexOff+=3) {
