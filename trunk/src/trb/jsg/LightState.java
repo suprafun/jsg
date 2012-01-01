@@ -86,7 +86,7 @@ public class LightState implements Serializable {
 		private static final long serialVersionUID = 0L;
 		
 		public Color3f ambient = new Color3f(0, 0, 0);
-		public Color3f diffuse = new Color3f(0, 0, 0);
+		public Color3f diffuse = new Color3f(1, 1, 1);
 		public Color3f specular = new Color3f(0, 0, 0);
 		public Point4f position = new Point4f(0, 0, 1, 0);
 		public Vector3f spotDirection = new Vector3f(0, 0, -1);
