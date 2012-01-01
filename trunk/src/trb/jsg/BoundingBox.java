@@ -137,10 +137,10 @@ public class BoundingBox {
 	/**
 	 * Returns a string representation of this class.
 	 */
+    @Override
 	public String toString() {
-		return new String("Bounding box: Lower=" + lower.x + " " + lower.y
-				+ " " + lower.z + " Upper=" + upper.x + " " + upper.y + " "
-				+ upper.z);
+		return "Bounding box: Lower=" + lower.x + " " + lower.y	+ " " + lower.z 
+                + " Upper=" + upper.x + " " + upper.y + " " + upper.z;
 	}
 
 }
