@@ -66,8 +66,8 @@ public class View implements Serializable {
 	private Plane[] worldPlanes = new Plane[6];
 	
 	// temp vars
-	private Point3d lower = new Point3d();
-	private Point3d upper = new Point3d();
+	private Point3f lower = new Point3f();
+	private Point3f upper = new Point3f();
 	
 	/**
 	 * Default constructor.
