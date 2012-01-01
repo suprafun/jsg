@@ -82,13 +82,13 @@ public class View implements Serializable {
 
 	/**
 	 * Sets the view frustum to perspective projection.
-	 * @param fovY the field of view in radians
+	 * @param fovYRad the field of view in radians
 	 * @param aspect the aspect ratio
 	 * @param near the near plane
 	 * @param far the far plane
 	 */
-    public void perspective(float fovY, float aspect, float near, float far) {
-        float h = (float) Math.tan(fovY) * near * .5f;
+    public void perspective(float fovYRad, float aspect, float near, float far) {
+        float h = (float) Math.tan(fovYRad) * near * .5f;
         float w = h * aspect;
         frustum(-w, w, h, -h, near, far);
     }
@@ -122,16 +122,16 @@ public class View implements Serializable {
 		
 		// create the planes of the camera
 		Tuple3f origo = new Point3f();
-		Tuple3f ul = new Point3f((float)l,  (float)t,    (float)n);
-		Tuple3f ur = new Point3f((float)r, (float)t,    (float)n);
-		Tuple3f ll = new Point3f((float)l,  (float)b, (float)n);
-		Tuple3f lr = new Point3f((float)r, (float)b, (float)n);
-		planes[0] = new Plane(new Point3f(0,0,(float)-n), new Point3f(0,0,-1));
+		Tuple3f ul = new Point3f(l, t, n);
+		Tuple3f ur = new Point3f(r, t, n);
+		Tuple3f ll = new Point3f(l, b, n);
+		Tuple3f lr = new Point3f(r, b, n);
+		planes[0] = new Plane(new Point3f(0,0,-n), new Point3f(0,0,-1));
 		planes[1] = new Plane(origo, ll, ul);
 		planes[2] = new Plane(origo, ur, lr);
 		planes[3] = new Plane(origo, ul, ur);
 		planes[4] = new Plane(origo, lr, ll);
-		planes[5] = new Plane(new Point3f(0,0,(float)-f),  new Point3f(0,0,1));
+		planes[5] = new Plane(new Point3f(0,0,-f),  new Point3f(0,0,1));
 		
 		if (t > b) {
 			for (int i=1; i<5; i++) {
@@ -167,12 +167,12 @@ public class View implements Serializable {
 		projectionMatrix = p;
 		
 		// create the planes of the camera
-		planes[0] = new Plane(new Point3f(0,0,(float)-n), new Point3f(0,0,-1));
+		planes[0] = new Plane(new Point3f(0,0,-n), new Point3f(0,0,-1));
 		planes[1] = new Plane(new Point3f(l, 0, 0), new Point3f( 1, 0, 0));
 		planes[2] = new Plane(new Point3f(r, 0, 0), new Point3f(-1, 0, 0));
 		planes[3] = new Plane(new Point3f(0, t, 0), new Point3f( 0,  1, 0));
 		planes[4] = new Plane(new Point3f(0, b, 0), new Point3f( 0, -1, 0));
-		planes[5] = new Plane(new Point3f(0,0,(float)-f),  new Point3f(0,0,1));
+		planes[5] = new Plane(new Point3f(0,0,-f),  new Point3f(0,0,1));
 		
 		if (t > b) {
 			planes[3].N.scale(-1);
@@ -197,7 +197,7 @@ public class View implements Serializable {
 	public boolean isInsideFrustum(Matrix4f modelViewMatrix, BoundingSphere boundingSphere, Point3f center3f) {
 		center3f.set(boundingSphere.getCenter());
 		modelViewMatrix.transform(center3f);
-		float radius = (float) boundingSphere.getRadius();
+		float radius = boundingSphere.getRadius();
 		
 		for (int planeIdx=0; planeIdx<planes.length; planeIdx++) {
 			Plane plane = planes[planeIdx];
@@ -225,7 +225,7 @@ public class View implements Serializable {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 	
