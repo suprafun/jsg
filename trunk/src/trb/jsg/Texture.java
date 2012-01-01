@@ -205,6 +205,15 @@ public class Texture implements Serializable {
 	public ByteBuffer getPixels(int cubeSide, int level) {
 		return pixels[cubeSide][level];
 	}
+
+	/**
+	 * Gets a reference to the texture pixels. pixelsChanged() must be called
+	 * after changing pixels for the changes to take effect. 
+	 * @return a reference to the texture data
+	 */
+	public ByteBuffer[][] getPixels() {
+		return pixels;
+	}
 	
 	/**
 	 * Notify the renderer that the pixels has changed.
