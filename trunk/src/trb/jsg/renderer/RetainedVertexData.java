@@ -259,8 +259,8 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 	 * @return the bounding box in world space
 	 */
 	public BoundingBox calculateBoundingBox(Matrix4f localToWorldMatrix) {
-		Point3d lower = new Point3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-		Point3d upper = new Point3d(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+		Point3f lower = new Point3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
+		Point3f upper = new Point3f(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
 		FloatBuffer coords = vertexData.coordinates;
 		IntBuffer indices = vertexData.indices;
 		for (int index=0; index<indices.limit(); index++) {
