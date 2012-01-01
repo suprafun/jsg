@@ -582,8 +582,8 @@ class StateSortRenderer {
 		modelViewMatrix.set(view.getCameraMatrix());
 		GLUtils.loadMatrix(modelViewMatrix);
 		
-		Point3d lower = new Point3d();
-		Point3d upper = new Point3d();
+		Point3f lower = new Point3f();
+		Point3f upper = new Point3f();
 		Point3f l = new Point3f(lower);
 		Point3f u = new Point3f(upper);
 
