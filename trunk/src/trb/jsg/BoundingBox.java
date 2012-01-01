@@ -42,15 +42,11 @@ import javax.vecmath.*;
 
 public class BoundingBox {
 
-	/**
-	 * The corner of the bounding box with the numerically smallest values.
-	 */
-	Point3d lower;
+	/** The corner of the bounding box with the numerically smallest values. */
+	Point3f lower;
 
-	/**
-	 * The corner of the bounding box with the numerically largest values.
-	 */
-	Point3d upper;
+	/** The corner of the bounding box with the numerically largest values. */
+	Point3f upper;
 
 	/**
 	 * Constructs and initializes a BoundingBox given min,max in x,y,z.
@@ -58,9 +54,9 @@ public class BoundingBox {
 	 * @param lower the "small" corner
 	 * @param upper the "large" corner
 	 */
-	public BoundingBox(Point3d lower, Point3d upper) {
-		this.lower = new Point3d(lower);
-		this.upper = new Point3d(upper);
+	public BoundingBox(Point3f lower, Point3f upper) {
+		this.lower = new Point3f(lower);
+		this.upper = new Point3f(upper);
 	}
 
 	/**
@@ -69,17 +65,15 @@ public class BoundingBox {
 	 * initialized to (1.0d, 1.0d, 1.0d).
 	 */
 	public BoundingBox() {
-		lower = new Point3d(-1.0d, -1.0d, -1.0d);
-		upper = new Point3d(1.0d, 1.0d, 1.0d);
+		lower = new Point3f(-1f, -1f, -1f);
+		upper = new Point3f( 1f,  1f,  1f);
 	}
 
 	/**
 	 * Gets the lower corner of this bounding box.
-	 * 
-	 * @param p1
-	 *            a Point to receive the lower corner of the bounding box
+	 * @param p1 a Point to receive the lower corner of the bounding box
 	 */
-	public void getLower(Point3d p1) {
+	public void getLower(Point3f p1) {
 		p1.x = lower.x;
 		p1.y = lower.y;
 		p1.z = lower.z;
@@ -87,12 +81,11 @@ public class BoundingBox {
 
 	/**
 	 * Sets the lower corner of this bounding box.
-	 * 
 	 * @param xmin minimum x value of boundining box
 	 * @param ymin minimum y value of boundining box
 	 * @param zmin minimum z value of boundining box
 	 */
-	public void setLower(double xmin, double ymin, double zmin) {
+	public void setLower(float xmin, float ymin, float zmin) {
 		lower.x = xmin;
 		lower.y = ymin;
 		lower.z = zmin;
@@ -102,8 +95,7 @@ public class BoundingBox {
 	 * Sets the lower corner of this bounding box.
 	 * @param p1 a Point defining the new lower corner of the bounding box
 	 */
-	public void setLower(Point3d p1) {
-
+	public void setLower(Point3f p1) {
 		lower.x = p1.x;
 		lower.y = p1.y;
 		lower.z = p1.z;
@@ -113,7 +105,7 @@ public class BoundingBox {
 	 * Gets the upper corner of this bounding box.
 	 * @param p1 a Point to receive the upper corner of the bounding box
 	 */
-	public void getUpper(Point3d p1) {
+	public void getUpper(Point3f p1) {
 		p1.x = upper.x;
 		p1.y = upper.y;
 		p1.z = upper.z;
@@ -125,7 +117,7 @@ public class BoundingBox {
 	 * @param ymax max y value of boundining box
 	 * @param zmax max z value of boundining box
 	 */
-	public void setUpper(double xmax, double ymax, double zmax) {
+	public void setUpper(float xmax, float ymax, float zmax) {
 		upper.x = xmax;
 		upper.y = ymax;
 		upper.z = zmax;
@@ -136,7 +128,7 @@ public class BoundingBox {
 	 * 
 	 * @param p1 a Point defining the new upper corner of the bounding box
 	 */
-	public void setUpper(Point3d p1) {
+	public void setUpper(Point3f p1) {
 		upper.x = p1.x;
 		upper.y = p1.y;
 		upper.z = p1.z;
