@@ -830,6 +830,14 @@ public class State implements Serializable {
 		 * Sets this material's diffuse color.
 		 * @param color the material's diffuse color
 		 */
+		public void setDiffuseColor(Color3f color) {
+			this.diffuseColor.set(new Color4f(color.x, color.y, color.z, 1));
+		}
+		
+		/**
+		 * Sets this material's diffuse color.
+		 * @param color the material's diffuse color
+		 */
 		public void setDiffuseColor(Color4f color) {
 			this.diffuseColor.set(color);
 			for (int ownerIdx=0; ownerIdx<owners.size(); ownerIdx++) {
