@@ -210,7 +210,7 @@ class GLState {
 	 */
 	public static void apply(Shape shape) {
 		State state = shape.getState();
-		currentProgram = ((RetainedShader) state.getShader().getShaderProgram().nativePeer).programId;
+		currentProgram = (state.getShader() == null) ? 0 : ((RetainedShader) state.getShader().getShaderProgram().nativePeer).programId;
 		blendEnabled = state.isBlendEnabled();
 		blendSrcFunc = state.getBlendSrcFunc();
 		blendDstFunc = state.getBlendDstFunc();
@@ -260,8 +260,13 @@ class GLState {
 			}
 			TextureUnitState glUnit = glUnits[unitIdx];
 			glUnit.enabled = shapeUnit.isEnabled();
-			glUnit.enabledType = shapeUnit.getTexture().getType().get();
-			glUnit.bindId = ((RetainedTexture) shapeUnit.getTexture().nativePeer).getTextureId();
+            if (shapeUnit.getTexture() != null) {
+                glUnit.enabledType = shapeUnit.getTexture().getType().get();
+                glUnit.bindId = ((RetainedTexture) shapeUnit.getTexture().nativePeer).getTextureId();
+            } else {
+                glUnit.enabledType = GL_TEXTURE_2D;
+                glUnit.bindId = 0;
+            }
 			glUnit.envMode = shapeUnit.getTextureEnvMode().get();
 			glUnit.combineFuncRGB = shapeUnit.getCombineFuncRGB().get();
 			glUnit.combineFuncAlpha = shapeUnit.getCombineFuncAlpha().get();
