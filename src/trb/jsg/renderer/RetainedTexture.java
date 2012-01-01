@@ -98,7 +98,7 @@ class RetainedTexture implements TexturePeer, NativeResource {
 		
 		if (isDataDirty) {
 			isDataDirty = false;
-			System.out.println(getClass().getSimpleName()+" update data");
+			//System.out.println(getClass().getSimpleName()+" update data");
 
 			if (textureId.get(0) <= 0) {
 				textureId.rewind();
@@ -132,7 +132,7 @@ class RetainedTexture implements TexturePeer, NativeResource {
 					for (int levelIdx = 0; levelIdx < texture.getLevelCount(0); levelIdx++) {
 						ByteBuffer pixels = texture.getPixels(0, levelIdx);
 						pixels.rewind();
-						System.out.println("glTexImage2D "+levelIdx+" w="+w+" h="+h);
+						//System.out.println("glTexImage2D "+levelIdx+" w="+w+" h="+h);
 						glTexImage2D(GL_TEXTURE_2D, levelIdx, texture.getInternalFormat()
 								, w, h
 								, 0, texture.getFormat().get(), GL_UNSIGNED_BYTE, pixels);
@@ -164,7 +164,7 @@ class RetainedTexture implements TexturePeer, NativeResource {
 						cubew = Math.max(1, cubew >> 1);
 						cubeh = Math.max(1, cubeh >> 1);
 						int mipmapVal = texture.getGenerateMipMaps() ? GL_TRUE : GL_FALSE;
-						System.err.println("glTexParameteri "+ sideTarget+" GL_GENERATE_MIPMAP "+mipmapVal);
+						//System.err.println("glTexParameteri "+ sideTarget+" GL_GENERATE_MIPMAP "+mipmapVal);
 						//glTexParameteri(target, GL_GENERATE_MIPMAP, mipmapVal);
 						Util.checkGLError();
 					}
