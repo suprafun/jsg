@@ -275,7 +275,6 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 			upper.y = Math.max(upper.y, tempCoord.y);
 			upper.z = Math.max(upper.z, tempCoord.z);
 		}
-		System.out.println(new BoundingBox(lower, upper));
 		return new BoundingBox(lower, upper);
 	}
 	
