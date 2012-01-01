@@ -34,6 +34,7 @@ package trb.jsg;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Matrix4f;
 
@@ -63,7 +64,7 @@ public class TreeNode implements Serializable {
 	/** List of children */
 	protected ArrayList<TreeNode> children = new ArrayList<TreeNode>();
 	
-	/** All transforms in this node and its descandants need to be updated */
+	/** All transforms in this node and its descendants need to be updated */
 	protected boolean isSubtreeDirty = true;
 	
 	/** Node is part of a path to a dirty subtree */
@@ -83,7 +84,7 @@ public class TreeNode implements Serializable {
 	 * Sets the nodes transform matrix by copy.
 	 * @param newTransform the new transform
 	 */
-	public void setTranform(Matrix4f newTransform) {
+	public void setTransform(Matrix4f newTransform) {
 		transform.set(newTransform);
 		isIdentity = false;		
 		
@@ -181,6 +182,14 @@ public class TreeNode implements Serializable {
 	}
 	
 	/**
+	 * Gets a list of all the children.
+	 * @return a list of all the chilren
+	 */
+	public List<TreeNode> getChildren() {
+		return new ArrayList(children);
+	}
+	
+	/**
 	 * Adds the specified shape.
 	 * @param shape the shape to add
 	 */
@@ -190,7 +199,7 @@ public class TreeNode implements Serializable {
 		if (root != null) {
 			root.renderPass.addShape(shape);
 		} else {
-			Thread.dumpStack();
+//			Thread.dumpStack();
 		}
 		flagAsDirty();
 	}
@@ -218,6 +227,14 @@ public class TreeNode implements Serializable {
 	 */
 	public Shape getShape(int index) {
 		return shapes.get(index);
+	}
+	
+	/**
+	 * Gets a list of all the shapes.
+	 * @return a list of all the shapes
+	 */
+	public List<Shape> getShapes() {
+		return new ArrayList(shapes);
 	}
 	
 	/**
@@ -273,7 +290,7 @@ public class TreeNode implements Serializable {
 	 * @param node the node to search
 	 * @param updateShapes true if shapes should be updated
 	 */
-	protected void updateTree(boolean updateShapes) {
+	public void updateTree(boolean updateShapes) {
 		updateShapes |= isSubtreeDirty;
 		
 		if (updateShapes) {
