@@ -50,8 +50,8 @@ import trb.jsg.util.ObjectArray;
 
 /**
  * A index triangle array. The number of triangles rendered is specified by the
- * length of indices. Buffer position an limit is used. All non null coordinate
- * are used. They must be atleast as large to contain the maximim index in
+ * length of indices. Buffer position and limit is used. All non null coordinate
+ * are used. They must be at least as large to contain the maximim index in
  * indices.
  * <p>
  * Both bounding box and sphere are optional. If both are provided, viewfrustum
