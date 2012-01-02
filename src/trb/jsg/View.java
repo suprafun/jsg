@@ -48,6 +48,8 @@ import javax.vecmath.*;
 public class View implements Serializable {
 
 	private static final long serialVersionUID = 0L;
+
+    public static boolean useFrustumCulling = true;
 	
 	// defines the viewing volume
 	private Matrix4f projectionMatrix;
@@ -195,17 +197,19 @@ public class View implements Serializable {
 	 * @return true if BoundingSphere is inside frustum
 	 */
 	public boolean isInsideFrustum(Matrix4f modelViewMatrix, BoundingSphere boundingSphere, Point3f center3f) {
-		center3f.set(boundingSphere.getCenter());
-		modelViewMatrix.transform(center3f);
-		float radius = boundingSphere.getRadius();
-		
-		for (int planeIdx=0; planeIdx<planes.length; planeIdx++) {
-			Plane plane = planes[planeIdx];
-			float distance = plane.getDistance(center3f);
-			if (distance < -radius) {
-				return false;
-			}
-		}
+        if (useFrustumCulling) {
+            center3f.set(boundingSphere.getCenter());
+            modelViewMatrix.transform(center3f);
+            float radius = boundingSphere.getRadius();
+
+            for (int planeIdx = 0; planeIdx < planes.length; planeIdx++) {
+                Plane plane = planes[planeIdx];
+                float distance = plane.getDistance(center3f);
+                if (distance < -radius) {
+                    return false;
+                }
+            }
+        }
 		
 		return true;
 	}
@@ -218,13 +222,15 @@ public class View implements Serializable {
 	 * @return true if BoundingSphere is inside frustum
 	 */
 	public boolean isInsideFrustum(Point3f center3f, float radius) {
-		for (int planeIdx=0; planeIdx<worldPlanes.length; planeIdx++) {
-			Plane plane = worldPlanes[planeIdx];
-			float distance = plane.getDistance(center3f);
-			if (distance < -radius) {
-				return false;
-			}
-		}
+        if (useFrustumCulling) {
+            for (int planeIdx = 0; planeIdx < worldPlanes.length; planeIdx++) {
+                Plane plane = worldPlanes[planeIdx];
+                float distance = plane.getDistance(center3f);
+                if (distance < -radius) {
+                    return false;
+                }
+            }
+        }
 
 		return true;
 	}
