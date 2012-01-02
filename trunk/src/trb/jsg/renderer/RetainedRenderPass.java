@@ -57,7 +57,7 @@ class RetainedRenderPass implements RenderPassPeer {
 	public RetainedSceneGraph sceneGraphPeer;
 	
 	/** The slow renderer is used if the shape can not be rendered by the other renderers */
-//	private SlowRenderer slowRenderer = new SlowRenderer(this);
+	//private SlowRenderer slowRenderer = new SlowRenderer(this);
 	
 	/** The StateSortRenderer is used if there shapes can be state sorted */
 	private StateSortRenderer renderer = new StateSortRenderer(this);
@@ -91,7 +91,7 @@ class RetainedRenderPass implements RenderPassPeer {
 		
 		peer.renderer = renderer;
 		renderer.add(peer);
-		//slowRenderer.shapes.add((SimpleShapePeer) shape.nativePeer);
+		//slowRenderer.shapes.add(peer);
 	}
 
 	/**
@@ -160,6 +160,7 @@ class RetainedRenderPass implements RenderPassPeer {
 			glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 		}
 		if ((clearMask & GL_DEPTH_BUFFER_BIT) != 0) {
+            GLState.applyDepthMaskDif(true);
 			glClearDepth(renderPass.getClearDepth());
 		}
 		if ((clearMask & GL_STENCIL_BUFFER_BIT) != 0) {
@@ -176,6 +177,8 @@ class RetainedRenderPass implements RenderPassPeer {
 		glMatrixMode(GL_MODELVIEW);		
 		
 		renderer.render();
+        //slowRenderer.render(new Matrix4f());
+
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 		glPopAttrib();
 		
