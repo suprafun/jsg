@@ -155,8 +155,8 @@ class StateSortRenderer {
 		GLState.modelWorldMatrix = new Matrix4f();
 		GLState.modelWorldMatrix.setIdentity();
 		
-		// load identity and apply lights
-		GLUtils.loadMatrix(GLState.modelWorldMatrix);
+		// lights must be transformed by the view transform
+        GLUtils.loadMatrix(view.getCameraMatrix());
 		GLState.applyLights(renderPassPeer.renderPass.getLightState());
 		
 		modelViewMatrix.set(view.getCameraMatrix());
