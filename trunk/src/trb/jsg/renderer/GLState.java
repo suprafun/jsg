@@ -423,15 +423,15 @@ class GLState {
 		State state = shape.getState();
 		
 		// shader program
-		if (state.getShader() != null) {
-			RetainedShader simpleShaderPeer = (RetainedShader) state.getShader().getShaderProgram().nativePeer;
-			int shapeShaderId = simpleShaderPeer.programId;
-			if (currentProgram != shapeShaderId) {
-				currentProgram = shapeShaderId;
-				glUseProgram(currentProgram);
-			}
-		}
-		Util.checkGLError();
+        int shapeShaderId = 0;
+        if (state.getShader() != null) {
+            shapeShaderId = ((RetainedShader) state.getShader().getShaderProgram().nativePeer).programId;
+        }
+        if (currentProgram != shapeShaderId) {
+            currentProgram = shapeShaderId;
+            glUseProgram(currentProgram);
+        }
+        Util.checkGLError();
 		
 		// blend
 		if (blendEnabled != state.isBlendEnabled()) {
@@ -455,10 +455,7 @@ class GLState {
 		}		
 		
 		// depth mask
-		if (depthWriteEnabled != state.isDepthWriteEnabled()) {
-			depthWriteEnabled = state.isDepthWriteEnabled();
-			glDepthMask(depthWriteEnabled);			
-		}
+        applyDepthMaskDif(state.isDepthWriteEnabled());
 
 		// cull and front face
 		if (cullEnabled != state.isCullEnabled()) {
@@ -590,6 +587,14 @@ class GLState {
 		}
 		Util.checkGLError();
 	}
+
+    public static void applyDepthMaskDif(boolean b) {
+        if (depthWriteEnabled != b) {
+            depthWriteEnabled = b;
+            glDepthMask(depthWriteEnabled);
+        }
+    }
+
 	/**
 	 * Applies the shapes state by only setting the state that has changed. 
 	 * @param shape contains the shape to set
