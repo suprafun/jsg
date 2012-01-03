@@ -32,12 +32,14 @@
 
 package trb.jsg.renderer;
 
+import java.awt.Rectangle;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.EXTTextureFilterAnisotropic.*;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.Util;
 
@@ -64,13 +66,19 @@ class RetainedTexture implements TexturePeer, NativeResource {
 	public ArrayList<Object> parents = new ArrayList<Object>();
 	
 	/** Set to true when texture data is changed and cleared when texture is uploaded */
-	public boolean isDataDirty = true;
+	private boolean isAllDataDirty = true;
+
+    /** Cleared when texture is uploaded */
+    private ArrayList<Rectangle> dirtyRects = new ArrayList();
+
+    /** Use texImage the first time and texSubImage when updating, even if all the image is updated */
+    private boolean dataCreated = false;
 	
 	/** Set to true when texture state is changed and cleared when texture state is set */
-	public boolean isStateDirty = true;
+	private boolean isStateDirty = true;
 
 	/** The peers texture */
-	public Texture texture;
+	private Texture texture;
 
 	/** The opengl texture id */
 	private IntBuffer textureId = BufferUtils.createIntBuffer(1);
@@ -87,7 +95,7 @@ class RetainedTexture implements TexturePeer, NativeResource {
 	 * Implements SimpleNativeResource.
 	 */
 	public void updateNativeResource() {
-		if (isDataDirty || isStateDirty) {
+		if (isDataDirty() || isStateDirty) {
 			for (int i=0; i<parents.size(); i++) {
 				Object obj = parents.get(i);
 				if (obj instanceof Shape) {
@@ -96,10 +104,7 @@ class RetainedTexture implements TexturePeer, NativeResource {
 			}
 		}
 		
-		if (isDataDirty) {
-			isDataDirty = false;
-			//System.out.println(getClass().getSimpleName()+" update data");
-
+		if (isDataDirty()) {
 			if (textureId.get(0) <= 0) {
 				textureId.rewind();
 				glGenTextures(textureId);
@@ -129,16 +134,18 @@ class RetainedTexture implements TexturePeer, NativeResource {
 						int mipmapVal = texture.getGenerateMipMaps() ? GL_TRUE : GL_FALSE;
 						glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, mipmapVal);
 					}
-					for (int levelIdx = 0; levelIdx < texture.getLevelCount(0); levelIdx++) {
-						ByteBuffer pixels = texture.getPixels(0, levelIdx);
-						pixels.rewind();
-						//System.out.println("glTexImage2D "+levelIdx+" w="+w+" h="+h);
-						glTexImage2D(GL_TEXTURE_2D, levelIdx, texture.getInternalFormat()
-								, w, h
-								, 0, texture.getFormat().get(), GL_UNSIGNED_BYTE, pixels);
-						w = Math.max(1, w >> 1);
-						h = Math.max(1, h >> 1);
-					}
+                    if (dirtyRects.size() > 0) {
+                        for (int i=0; i<dirtyRects.size(); i++) {
+                            Rectangle rect = dirtyRects.get(i);
+                            update2D(rect.x, rect.y, rect.width, rect.height);
+                        }
+                    } else {
+                        if (!dataCreated) {
+                            create2D(w, h);
+                        } else {
+                            update2D(0, 0, w, h);
+                        }
+                    }
 				}
 				break;
 			case TEXTURE_3D:
@@ -157,9 +164,15 @@ class RetainedTexture implements TexturePeer, NativeResource {
 						pixels.rewind();
 						int sideTarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X+sideIdx;
 						Util.checkGLError();
-						glTexImage2D(sideTarget, levelIdx, texture.getInternalFormat()
-								, cubew, cubeh
-								, 0, texture.getFormat().get(), GL_UNSIGNED_BYTE, pixels);
+                        if (!dataCreated) {
+                            glTexImage2D(sideTarget, levelIdx, texture.getInternalFormat()
+                                    , cubew, cubeh
+                                    , 0, texture.getFormat().get(), GL_UNSIGNED_BYTE, pixels);
+                        } else {
+                            glTexSubImage2D(sideTarget, levelIdx
+                                    , 0, 0, cubew, cubeh
+                                    , texture.getFormat().get(), GL_UNSIGNED_BYTE, pixels);
+                        }
 						Util.checkGLError();
 						cubew = Math.max(1, cubew >> 1);
 						cubeh = Math.max(1, cubeh >> 1);
@@ -169,6 +182,7 @@ class RetainedTexture implements TexturePeer, NativeResource {
 						Util.checkGLError();
 					}
 				}
+                dataCreated = true;
 				break;
 			default:
 				Thread.dumpStack();
@@ -179,6 +193,9 @@ class RetainedTexture implements TexturePeer, NativeResource {
 				System.err.println("Non power of two textures not supported at the moment w="+w+" h="+h+" d="+d
 						+" "+texture.getWidth()+" "+texture.getHeight()+" "+texture.getDepth());
 			}
+
+            isAllDataDirty = false;
+            dirtyRects.clear();
 		}
 
 		if (isStateDirty) {
@@ -204,6 +221,43 @@ class RetainedTexture implements TexturePeer, NativeResource {
 		}
 	}
 
+    private void create2D(int w, int h) {
+        for (int levelIdx = 0; levelIdx < texture.getLevelCount(0); levelIdx++) {
+            ByteBuffer pixels = texture.getPixels(0, levelIdx);
+            pixels.rewind();
+            //System.out.println("glTexImage2D "+levelIdx+" w="+w+" h="+h);
+            glTexImage2D(GL_TEXTURE_2D, levelIdx, texture.getInternalFormat(), w, h, 0, texture.getFormat().get(), GL_UNSIGNED_BYTE, pixels);
+            w = Math.max(1, w >> 1);
+            h = Math.max(1, h >> 1);
+        }
+        dataCreated = true;
+    }
+
+    private void update2D(int rx, int ry, int rw, int rh) {
+        int x = Math.max(0, rx);
+        int y = Math.max(0, ry);
+        int x2 = Math.min(texture.getWidth(), rx + rw);
+        int y2 = Math.min(texture.getHeight(), ry + rh);
+        int w = Math.max(0, x2 - x);
+        int h = Math.max(0, y2 - y);
+        int mipw = texture.getWidth();
+        int miph = texture.getHeight();
+        for (int levelIdx = 0; levelIdx < texture.getLevelCount(0); levelIdx++) {
+            GL11.glPixelStorei(GL_UNPACK_ROW_LENGTH, mipw);
+            ByteBuffer pixels = texture.getPixels(0, levelIdx);
+            pixels.rewind();
+            pixels.position((y*mipw+x)*texture.getInternalFormat());
+            glTexSubImage2D(GL_TEXTURE_2D, levelIdx, x, y, w, h, texture.getFormat().get(), GL_UNSIGNED_BYTE, pixels);
+            x = x >> 1;
+            y = y >> 1;
+            w = Math.max(1, w >> 1);
+            h = Math.max(1, h >> 1);
+            mipw = Math.max(1, mipw >> 1);
+            miph = Math.max(1, miph >> 1);
+        }
+        GL11.glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    }
+
 	/**
 	 * Implements SimpleNativeResource.
 	 */
@@ -226,8 +280,15 @@ class RetainedTexture implements TexturePeer, NativeResource {
 	/**
 	 * Implements TexturePeer.
 	 */
-	public void textureDataChanged(Texture texture) {
-		isDataDirty = true;
+	public void textureDataChanged(Texture texture, Rectangle[] dirtyRects) {
+        if (isAllDataDirty || dirtyRects.length == 0) {
+            isAllDataDirty = true;
+            this.dirtyRects.clear();
+        } else {
+            for (int i = 0; i < dirtyRects.length; i++) {
+                this.dirtyRects.add(dirtyRects[i]);
+            }
+        }
 		for (Object parent : parents) {
 			if (parent instanceof Shape) {
 				RetainedShape shapePeer = (RetainedShape) ((Shape)parent).nativePeer;
@@ -248,6 +309,10 @@ class RetainedTexture implements TexturePeer, NativeResource {
 			}
 		}
 	}
+
+    private boolean isDataDirty() {
+        return isAllDataDirty || (dirtyRects.size() > 0);
+    }
 //	
 //	/**
 //	 * Scales the texture to the specified size.
