@@ -32,11 +32,12 @@
 
 package trb.jsg.peers;
 
+import java.awt.Rectangle;
 import trb.jsg.Texture;
 
 public interface TexturePeer {
 
-	public void textureDataChanged(Texture texture);
+	public void textureDataChanged(Texture texture, Rectangle[] dirtyRects);
 	
 	public void textureStateChanged(Texture texture);
 }
