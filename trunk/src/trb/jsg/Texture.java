@@ -32,6 +32,7 @@
 
 package trb.jsg;
 
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.*;
@@ -182,7 +183,7 @@ public class Texture implements Serializable {
 		this.pixels = pixels;
 		this.generateMipMaps = generateMipMaps;
 		if (nativePeer != null) {
-			nativePeer.textureDataChanged(this);
+			nativePeer.textureDataChanged(this, null);
 		}
 	}
 	
@@ -217,10 +218,12 @@ public class Texture implements Serializable {
 	
 	/**
 	 * Notify the renderer that the pixels has changed.
+     * @param dirtyRects list of dirty rectangles to update. Everything is
+     *        updated if nothing is provided.
 	 */
-	public void pixelsChanged() {
+	public void pixelsChanged(Rectangle... dirtyRects) {
 		if (nativePeer != null) {
-			nativePeer.textureDataChanged(this);
+			nativePeer.textureDataChanged(this, dirtyRects);
 		}
 	}
 
