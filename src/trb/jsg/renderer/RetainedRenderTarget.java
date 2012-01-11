@@ -139,8 +139,19 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 					glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, peer.getTextureId(), 0);
 				}
 			}
-			if (glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) != GL_FRAMEBUFFER_COMPLETE_EXT) {
-				throw new RuntimeException("Framebuffer not complete");
+            int frameBufferState = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+			if (GL_FRAMEBUFFER_COMPLETE_EXT != frameBufferState) {
+                String description = "";
+                if (GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT == frameBufferState) {
+                    description = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT";
+                } else if (GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT == frameBufferState) {
+                    description = "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT";
+                } else if (GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT == frameBufferState) {
+                    description = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT";
+                } else if (GL_FRAMEBUFFER_UNSUPPORTED_EXT == frameBufferState) {
+                    description = "GL_FRAMEBUFFER_UNSUPPORTED_EXT";
+                }
+				throw new RuntimeException("Framebuffer not complete. " + description);
 			}
 			Util.checkGLError();
 		}
