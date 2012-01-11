@@ -50,6 +50,9 @@ public class View implements Serializable {
 	private static final long serialVersionUID = 0L;
 
     public static boolean useFrustumCulling = true;
+
+    private float near = 0;
+    private float far = 0;
 	
 	// defines the viewing volume
 	private Matrix4f projectionMatrix;
@@ -90,6 +93,8 @@ public class View implements Serializable {
 	 * @param far the far plane
 	 */
     public void perspective(float fovYRad, float aspect, float near, float far) {
+        this.near = near;
+        this.far = far;
         float h = (float) Math.tan(fovYRad) * near * .5f;
         float w = h * aspect;
         frustum(-w, w, h, -h, near, far);
@@ -109,6 +114,8 @@ public class View implements Serializable {
 		if (f<n || n<=0) {
 			System.out.println("far plane should be larger than near, and both should be positive");
 		}
+        this.near = n;
+        this.far = f;
 		
 		Matrix4f p = new Matrix4f();
 		p.setIdentity();
@@ -155,6 +162,8 @@ public class View implements Serializable {
 		if (f<n) {
 			System.out.println("far plane should be larger than near");
 		}
+        this.near = n;
+        this.far = f;
 		
 		Matrix4f p = new Matrix4f();
 		p.setIdentity();
@@ -365,4 +374,18 @@ public class View implements Serializable {
 	public Matrix4f getCameraMatrix() {
 		return cameraMatrix;
 	}
+
+    /**
+     * Gets the near clip distance.
+     */
+    public float getNear() {
+        return near;
+    }
+
+    /**
+     * Gets the far clip distance.
+     */
+    public float getFar() {
+        return far;
+    }
 }
