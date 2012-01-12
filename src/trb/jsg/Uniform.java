@@ -228,6 +228,12 @@ public class Uniform implements Serializable {
 		return data;
 	}
 
+    public void setFloats(float... floats) {
+        FloatBuffer floatData = (FloatBuffer) data;
+        floatData.put(floats).rewind();
+        notifyOwners();
+    }
+
 	/**
 	 * Sets the transpose flag.
 	 * @param transpose the transpose to set
@@ -251,8 +257,8 @@ public class Uniform implements Serializable {
 	 * Calls uniformedChanged(this) on all the owners.
 	 */
 	private void notifyOwners() {
-//		for (int i=0; i<owners.size(); i++) {
-//			owners.get(i).uniformChanged(this);
-//		}
+		for (int i=0; i<owners.size(); i++) {
+			owners.get(i).uniformChanged(this);
+		}
 	}
 }
