@@ -160,8 +160,20 @@ public class Texture implements Serializable {
 	/** The native peer. Don't touch. */
 	transient public TexturePeer nativePeer;
 	
-	public Texture() {		
-	}
+    public Texture() {
+    }
+
+    public Texture(TextureType type, int internalFormat, int width, int height
+            , int depth, Format format, ByteBuffer[][] pixels, boolean generateMipMaps) {
+        this.type = type;
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
+        this.internalFormat = internalFormat;
+        this.format = format;
+        this.pixels = pixels;
+        this.generateMipMaps = generateMipMaps;
+    }
 	
 	/**
 	 * Sets the texture data.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Java Scene Graph
+ * Copyright (c) 2012 Java Scene Graph
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

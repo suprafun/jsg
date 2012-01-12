@@ -166,7 +166,7 @@ class RetainedShader implements ShaderPeer, NativeResource {
 				GL20.glCompileShader(vertexId);
 				if (!GLUtils.isCompileOk(vertexId)) {
 					System.out.println("Failed to compile vertex shader:");
-					GLUtils.printShader(program.getVertexShader());
+					System.out.println(program.getVertexShader());
 					GLUtils.printLogInfo(vertexId);
 				}
 			}
@@ -179,7 +179,7 @@ class RetainedShader implements ShaderPeer, NativeResource {
 				GL20.glCompileShader(fragmentId);
 				if (!GLUtils.isCompileOk(fragmentId)) {
 					System.out.println("Failed to compile fragment shader:");
-					GLUtils.printShader(program.getFragmentShader());
+					System.out.println(program.getFragmentShader());
 					GLUtils.printLogInfo(fragmentId);
 				}
 			}
