@@ -80,6 +80,7 @@ public class Shader implements Serializable {
 	 * param uniform the unform to be added to the set
 	 */
 	public void putUniform(Uniform uniform) {
+        uniform.owners.add(this);
 		uniformSet.put(uniform.getName(), uniform);
 		changeFrameIdx = Renderer.frameIdx;
 	}
@@ -90,7 +91,10 @@ public class Shader implements Serializable {
 	 * @param name the name of the uniform to be removed 
 	 */
 	public void removeUniform(String name) {
-		uniformSet.remove(name);
+		Uniform uniform = uniformSet.remove(name);
+        if (uniform != null) {
+            uniform.owners.remove(this);
+        }
 	}
 	
 	/**
@@ -111,4 +115,8 @@ public class Shader implements Serializable {
 	public Uniform[] getAllUniforms() {
 		return uniformSet.values().toArray(new Uniform[uniformSet.size()]);
 	}
+
+    void uniformChanged(Uniform uniform) {
+        changeFrameIdx = Renderer.frameIdx;
+    }
 }
