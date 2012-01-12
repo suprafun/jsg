@@ -388,4 +388,13 @@ public class View implements Serializable {
     public float getFar() {
         return far;
     }
+
+    /**
+     * Creates a view with ortho projection.
+     */
+    public static View createOrtho(float l, float r, float t, float b, float n, float f) {
+        View view = new View();
+        view.ortho(l, r, t, b, n, f);
+        return view;
+    }
 }
