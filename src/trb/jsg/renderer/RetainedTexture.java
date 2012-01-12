@@ -115,20 +115,23 @@ class RetainedTexture implements TexturePeer, NativeResource {
 			GLState.glActiveTextureWrapper(GL13.GL_TEXTURE0);
 			GLState.glBindTextureWrapper(target, id);
 
-			int w = SGUtil.roundPow2(texture.getWidth());
-			int h = SGUtil.roundPow2(texture.getHeight());
-			int d = SGUtil.roundPow2(texture.getDepth());
+            int w = texture.getWidth();
+            int h = texture.getHeight();
+            int d = texture.getDepth();
+			int pow2w = SGUtil.roundPow2(w);
+			int pow2h = SGUtil.roundPow2(h);
+			int pow2d = SGUtil.roundPow2(d);
 			boolean isPow2 = false;
 			
 			switch (texture.getType()) {
 			case TEXTURE_1D:
 				System.err.println(getClass().getSimpleName()+" ERROR: GL_TEXTURE_1D not supported");
-				if (w == texture.getWidth()) {
+				if (pow2w == texture.getWidth()) {
 					isPow2 = true;
 				}
 				break;
 			case TEXTURE_2D:
-				if (w == texture.getWidth() && h == texture.getHeight()) {
+				//if (pow2w == texture.getWidth() && pow2h == texture.getHeight()) {
 					isPow2 = true;
 					if (texture.getLevelCount(0) <= 1) {
 						int mipmapVal = texture.getGenerateMipMaps() ? GL_TRUE : GL_FALSE;
@@ -146,19 +149,19 @@ class RetainedTexture implements TexturePeer, NativeResource {
                             update2D(0, 0, w, h);
                         }
                     }
-				}
+				//}
 				break;
 			case TEXTURE_3D:
 				System.err.println(getClass().getSimpleName()+" ERROR: GL_TEXTURE_3D not supported");
-				if (w == texture.getWidth() && h == texture.getHeight() && d == texture.getDepth()) {
+				if (pow2w == texture.getWidth() && pow2h == texture.getHeight() && pow2d == texture.getDepth()) {
 					isPow2 = true;
 				}
 				break;
 			case TEXTURE_CUBE_MAP:
 				isPow2 = true;
 				for (int sideIdx=0; sideIdx<6; sideIdx++) {
-					int cubew = w;
-					int cubeh = h;
+					int cubew = pow2w;
+					int cubeh = pow2h;
 					for (int levelIdx = 0; levelIdx < texture.getLevelCount(sideIdx); levelIdx++) {
 						ByteBuffer pixels = texture.getPixels(sideIdx, levelIdx);
 						pixels.rewind();
@@ -189,10 +192,10 @@ class RetainedTexture implements TexturePeer, NativeResource {
 				break;
 			}
 			
-			if (!isPow2) {
-				System.err.println("Non power of two textures not supported at the moment w="+w+" h="+h+" d="+d
-						+" "+texture.getWidth()+" "+texture.getHeight()+" "+texture.getDepth());
-			}
+//			if (!isPow2) {
+//				System.err.println("Non power of two textures not supported at the moment w="+pow2w+" h="+pow2h+" d="+pow2d
+//						+" "+texture.getWidth()+" "+texture.getHeight()+" "+texture.getDepth());
+//			}
 
             isAllDataDirty = false;
             dirtyRects.clear();
