@@ -33,7 +33,6 @@
 package trb.jsg;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 
 import trb.jsg.peers.ShaderPeer;
 
@@ -66,10 +65,10 @@ public class ShaderProgram implements Serializable {
 	private String[] attributeNames = new String[0];
 
 	/** vertex shader text */
-	private ByteBuffer vertexShader;
+	private CharSequence vertexShader;
 
 	/** fragment shader text */
-	private ByteBuffer fragmentShader;
+	private CharSequence fragmentShader;
 
 	/** The native peer managed by the renderer. Don't touch. */
 	transient public ShaderPeer nativePeer;
@@ -81,7 +80,7 @@ public class ShaderProgram implements Serializable {
 	 * @param attributeNames list of attribute names that maps the names to the
 	 *                       attributes in the vertex data. 
 	 */
-	public ShaderProgram(ByteBuffer vertexShader, ByteBuffer fragmentShader, String... attributeNames) {
+	public ShaderProgram(CharSequence vertexShader, CharSequence fragmentShader, String... attributeNames) {
 		this.vertexShader = vertexShader;
 		this.fragmentShader = fragmentShader;
 		this.attributeNames = attributeNames;
@@ -99,7 +98,7 @@ public class ShaderProgram implements Serializable {
 	 * Gets the vertex shader text.
 	 * @return the vertexShader
 	 */
-	public ByteBuffer getVertexShader() {
+	public CharSequence getVertexShader() {
 		return vertexShader;
 	}
 
@@ -107,7 +106,7 @@ public class ShaderProgram implements Serializable {
 	 * Gets the fragment shader text.
 	 * @return the fragmentShader
 	 */
-	public ByteBuffer getFragmentShader() {
+	public CharSequence getFragmentShader() {
 		return fragmentShader;
 	}
 

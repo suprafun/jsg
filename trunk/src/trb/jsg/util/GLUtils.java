@@ -160,13 +160,4 @@ public class GLUtils {
  
 		Util.checkGLError();
 	}	
-	
-	public static void printShader(ByteBuffer shader) {
-		System.out.println("printShader limit "+shader.limit());
-		byte[] bytes = new byte[shader.limit()];
-		shader.rewind();
-		shader.get(bytes);
-		String str = new String(bytes);
-		System.out.println(str);
-	}
 }
