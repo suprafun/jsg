@@ -70,8 +70,7 @@ public class TexturedQuad {
             }
         }
         ByteBuffer[][] pixels = {{byteBuffer}};
-        Texture texture = new Texture();
-        texture.setTextureData(TextureType.TEXTURE_2D, 4, 256, 256, 0, Format.BGRA, pixels, false);
+        Texture texture = new Texture(TextureType.TEXTURE_2D, 4, 256, 256, 0, Format.BGRA, pixels, false);
 
         Shape shape = new Shape(VertexDataUtils.createQuad(100, 100, 300, 300, 0));
         shape.getState().setUnit(0, new Unit(texture));
