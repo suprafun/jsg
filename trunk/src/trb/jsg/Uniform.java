@@ -40,10 +40,10 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 
 import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
 
 import org.lwjgl.BufferUtils;
 //import org.lwjgl.util.vector.Matrix2f;
+import trb.jsg.util.Mat4;
 
 import trb.jsg.util.SGUtil;
 
@@ -175,18 +175,14 @@ public class Uniform implements Serializable {
 	 *        column major order
 	 * @param matrix the data
 	 */
-	public Uniform(String name, boolean transpose, Matrix4f... matrix) {
+	public Uniform(String name, boolean transpose, Mat4... matrix) {
 		this.name = name;
 		this.nameBuffer = SGUtil.nameToByteBuffer(name);
 		this.type = Type.MAT4;
 		this.transpose = transpose;
 		FloatBuffer floatData = BufferUtils.createFloatBuffer(matrix.length*16);
-		for (Matrix4f m : matrix) { 
-			floatData.put(m.m00).put(m.m01).put(m.m02).put(m.m03);
-			floatData.put(m.m10).put(m.m11).put(m.m12).put(m.m13);
-			floatData.put(m.m20).put(m.m21).put(m.m22).put(m.m23);
-			floatData.put(m.m30).put(m.m31).put(m.m32).put(m.m33);
-			floatData.rewind();
+		for (Mat4 m : matrix) {
+			floatData.put(m.toFloats()).rewind();
 		}
 	}
 	

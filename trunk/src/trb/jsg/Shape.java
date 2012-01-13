@@ -35,10 +35,9 @@ package trb.jsg;
 import java.io.Serializable;
 import java.util.Comparator;
 
-import javax.vecmath.Matrix4f;
-
 import trb.jsg.enums.SortOrder;
 import trb.jsg.peers.ShapePeer;
+import trb.jsg.util.Mat4;
 
 
 /**
@@ -71,7 +70,7 @@ public class Shape implements Serializable {
 	private SortOrder sortOrder = SortOrder.ANY;
 	
 	/** The shapes local to world matrix */
-	private Matrix4f modelMatrix = new Matrix4f();
+	private Mat4 modelMatrix = new Mat4();
 	
 	/** The vertex data */
 	private VertexData vertexData;
@@ -93,7 +92,6 @@ public class Shape implements Serializable {
 	}
 
     public Shape(VertexData vertexData) {
-        modelMatrix.setIdentity();
         state.owners.add(this);
         setVertexData(vertexData);
     }
@@ -184,7 +182,7 @@ public class Shape implements Serializable {
 	 * Sets the shapes local to world matrix.
 	 * @param modelMatrix the local to world matrix
 	 */
-	public void setModelMatrix(Matrix4f modelMatrix) {
+	public void setModelMatrix(Mat4 modelMatrix) {
 		this.modelMatrix = modelMatrix;
 		if (nativePeer != null) {
 			nativePeer.matrixChanged();
@@ -195,7 +193,7 @@ public class Shape implements Serializable {
 	 * Gets the shapes local to world matrix.
 	 * @return the local to world matrix
 	 */
-	public Matrix4f getModelMatrix() {
+	public Mat4 getModelMatrix() {
 		return modelMatrix;
 	}
 

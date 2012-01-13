@@ -34,8 +34,6 @@ package trb.jsg.renderer;
 
 import java.util.Comparator;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 
 import org.lwjgl.opengl.GL11;
@@ -47,11 +45,12 @@ import trb.jsg.Shape;
 import trb.jsg.Texture;
 import trb.jsg.VertexData;
 import trb.jsg.peers.*;
+import trb.jsg.util.Mat4;
 
 class RetainedShape implements ShapePeer {
 	
 	/** Identity matrix returned by getModelMatrix if renderType is DISPLAY_LIST_WORLD */
-	private static Matrix4f IDENTITY_MATRIX = new Matrix4f(1, 0, 0, 0,   0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 0, 1);
+	private static Mat4 IDENTITY_MATRIX = new Mat4();
 	
 	public static SimpleShapePeerComparator simpleShapePeerComparator = new SimpleShapePeerComparator();
 
@@ -420,7 +419,7 @@ class RetainedShape implements ShapePeer {
 	 * renderType is DISPLAY_LIST_WORLD.
 	 * @return the transform matrix
 	 */
-	public Matrix4f getModelMatrix() {
+	public Mat4 getModelMatrix() {
 		if (renderType == RenderType.DISPLAY_LIST_WORLD) {
 			return IDENTITY_MATRIX;
 		}

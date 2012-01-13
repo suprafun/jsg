@@ -35,8 +35,6 @@ package trb.jsg.renderer;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 
 import org.lwjgl.opengl.GL11;
@@ -45,6 +43,7 @@ import trb.jsg.BoundingBox;
 import trb.jsg.Shape;
 import trb.jsg.View;
 import trb.jsg.util.GLUtils;
+import trb.jsg.util.Mat4;
 import trb.jsg.util.RadixSort;
 
 /**
@@ -97,7 +96,7 @@ class StateSortRenderer {
 	private int[] radixSortInts = new int[100];
 	
 	/** Temp variable. The current model to view matrix. */
-	private Matrix4f modelViewMatrix = new Matrix4f();
+	private Mat4 modelViewMatrix = new Mat4();
 	
 	
 	public StateSortRenderer(RetainedRenderPass renderPassPeer) {
@@ -152,8 +151,7 @@ class StateSortRenderer {
 
 		// init transform
 		View view = renderPassPeer.renderPass.getView();
-		GLState.modelWorldMatrix = new Matrix4f();
-		GLState.modelWorldMatrix.setIdentity();
+		GLState.modelWorldMatrix = new Mat4();
 		
 		// lights must be transformed by the view transform
         GLUtils.loadMatrix(view.getCameraMatrix());
@@ -312,11 +310,11 @@ class StateSortRenderer {
 
 			// apply shape transform it has changed
 			boolean matrixChanged = false;
-			Matrix4f modelMatrix = peer.getModelMatrix();
+			Mat4 modelMatrix = peer.getModelMatrix();
 			if (!GLState.modelWorldMatrix.equals(modelMatrix)) {
 				GLState.modelWorldMatrix = modelMatrix;
 				modelViewMatrix.set(view.getCameraMatrix());
-				modelViewMatrix.mul(modelMatrix);
+				modelViewMatrix.mul(new Mat4(modelMatrix));
 				GLUtils.loadMatrix(modelViewMatrix);
 				matrixChanged = true;
 			}
@@ -384,11 +382,11 @@ class StateSortRenderer {
 
 			// apply shape transform it has changed
 			boolean matrixChanged = false;
-			Matrix4f modelMatrix = peer.getModelMatrix();
+			Mat4 modelMatrix = peer.getModelMatrix();
 			if (!GLState.modelWorldMatrix.equals(modelMatrix)) {
 				GLState.modelWorldMatrix = modelMatrix;
 				modelViewMatrix.set(view.getCameraMatrix());
-				modelViewMatrix.mul(modelMatrix);
+				modelViewMatrix.mul(new Mat4(modelMatrix));
 				GLUtils.loadMatrix(modelViewMatrix);
 				matrixChanged = true;
 			}
@@ -468,11 +466,11 @@ class StateSortRenderer {
 
 			// apply shape transform it has changed
 			boolean matrixChanged = false;
-			Matrix4f modelMatrix = peer.getModelMatrix();
+			Mat4 modelMatrix = peer.getModelMatrix();
 			if (!GLState.modelWorldMatrix.equals(modelMatrix)) {
 				GLState.modelWorldMatrix = modelMatrix;
 				modelViewMatrix.set(view.getCameraMatrix());
-				modelViewMatrix.mul(modelMatrix);
+				modelViewMatrix.mul(new Mat4(modelMatrix));
 				GLUtils.loadMatrix(modelViewMatrix);
 				matrixChanged = true;
 			}
@@ -531,11 +529,11 @@ class StateSortRenderer {
 
 			// apply shape transform it has changed
 			boolean matrixChanged = false;
-			Matrix4f modelMatrix = peer.getModelMatrix();
+			Mat4 modelMatrix = peer.getModelMatrix();
 			if (!GLState.modelWorldMatrix.equals(modelMatrix)) {
 				GLState.modelWorldMatrix = modelMatrix;
 				modelViewMatrix.set(view.getCameraMatrix());
-				modelViewMatrix.mul(modelMatrix);
+				modelViewMatrix.mul(new Mat4(modelMatrix));
 				GLUtils.loadMatrix(modelViewMatrix);
 				matrixChanged = true;
 			}
