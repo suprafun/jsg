@@ -93,7 +93,7 @@ public class RenderPass implements Serializable {
 	 * Adds a shape to the end of the RenderPass list of shapes.
 	 * @param shape the shape to add
 	 */
-	void addShape(Shape shape) {
+	public void addShape(Shape shape) {
 		if (shape.parent != null) {
 			throw new RuntimeException("Shape already has a parent");
 		}
@@ -109,7 +109,7 @@ public class RenderPass implements Serializable {
 	 * Removes the shape from the RenderPass list of shapes.
 	 * @param shape the shape to remove
 	 */
-	void removeShape(Shape shape) {
+    public void removeShape(Shape shape) {
 		if (shapes.remove(shape)) {
 			
 			if (nativePeer != null) {
