@@ -122,7 +122,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 	 */
 	public void removeListUser(RetainedShape shapePeer) {
 		listUsers.remove(shapePeer);
-		if (listUsers.size() == 0) {
+		if (listUsers.isEmpty()) {
 			RetainedSceneGraph renderPassPeer = ((RetainedRenderPass)shapePeer.shape.parent.nativePeer).sceneGraphPeer;
 			renderPassPeer.destroyList.add(this);
 		}		
@@ -325,7 +325,6 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 		FloatBuffer normals = vertexData.normals;
 		ObjectArray<VertexData.TexCoordData> texCoords = vertexData.texCoords;
 		long state = 0;
-		state |= (1 << 0);
 		if (normals != null) {
 			state |= (1 << 1);
 		}
