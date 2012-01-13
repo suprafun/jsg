@@ -33,8 +33,9 @@
 package trb.jsg;
 
 import java.io.Serializable;
-
-import javax.vecmath.*;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Tuple3f;
+import trb.jsg.util.Vec3;
 
 /**
  * The Plane represents a plane in 3d.
@@ -47,10 +48,10 @@ public class Plane implements Serializable {
 	private static final long serialVersionUID = 0L;
 	
 	/** A position on the Plane */
-	public Point3f  P = new Point3f();
+	public Vec3 P = new Vec3();
 	
 	/** The Plane normal */
-	public Vector3f N = new Vector3f();
+	public Vec3 N = new Vec3();
 	
 	//The tolerance given when comparing two plane object.
 	public final static float equalityTolerance = 0.0001f;
@@ -104,7 +105,7 @@ public class Plane implements Serializable {
 	 * Returns this plane's normal.
 	 * @return this plane's normal.
 	 */
-	public Vector3f getNormal() {
+	public Vec3 getNormal() {
 		return N;
 	}
 
@@ -148,10 +149,8 @@ public class Plane implements Serializable {
 	 * @param p3 the coordinate of the third point.
 	 */
 	public void setPlane(Tuple3f p1, Tuple3f p2, Tuple3f p3) {
-		Vector3f v1 = new Vector3f();
-		v1.sub(p3, p1);
-		Vector3f v2 = new Vector3f();
-		v2.sub(p2, p1);
+		Vec3 v1 = new Vec3(p3).sub_(p1);
+		Vec3 v2 = new Vec3(p2).sub_(p1);
 		P.set(p1);
 		N.cross(v1, v2);
 		N.normalize();
@@ -163,9 +162,7 @@ public class Plane implements Serializable {
 	 * @return true if coordinate is infront of this plane.
 	 */
 	public boolean isInfront(Tuple3f coordinate) {
-		if (getDistance(coordinate) >= 0.0f)
-			return true;
-		return false;
+		return getDistance(coordinate) >= 0.0f;
 	}
 
 	/**
@@ -174,9 +171,7 @@ public class Plane implements Serializable {
 	 * @returns true if p lies on this plane.
 	 */
 	public boolean lieOn(Tuple3f p) {
-		if (Math.abs(getDistance(p)) < equalityTolerance)
-			return true;
-		return false;
+		return Math.abs(getDistance(p)) < equalityTolerance;
 	}
 
 	/**
@@ -198,7 +193,10 @@ public class Plane implements Serializable {
 	 */
 	public float getLineIntersectionT(Tuple3f a, Tuple3f b) {
 		float div = N.x*(b.x-a.x) + N.y*(b.y-a.y) + N.z*(b.z-a.z);
-		if (div == 0.0f) return -1;//System.out.println("divide by 0 in Plane.getLineIntersectionT");
+		if (div == 0.0f) {
+            //System.out.println("divide by 0 in Plane.getLineIntersectionT");
+            return -1;
+        }
 		return - ( N.x*(a.x-P.x) + N.y*(a.y-P.y) + N.z*(a.z-P.z) ) / div;
 	}
 	
@@ -210,14 +208,13 @@ public class Plane implements Serializable {
 	 * @param b the coordinate of the end point.
 	 * @return the intersection point between this plane and the line (a,b).
 	 */
-	public Tuple3f getLineIntersection(Tuple3f a, Tuple3f b) {
+	public Vec3 getLineIntersection(Tuple3f a, Tuple3f b) {
 		float t = getLineIntersectionT(a, b);
-		if (t < 0 || t > 1)
+		if (t < 0 || t > 1) {
 			return null;
-		
-		Point3f tuple = new Point3f();
-		tuple.interpolate(a, b, t);
-		return tuple;
+        }
+
+        return new Vec3().interpolate_(a, b, t);
 	}
 
 	/**
@@ -227,8 +224,10 @@ public class Plane implements Serializable {
 	 * @return the parameter t of the intersection between this plane and the ray (pos,dir).
 	 */
 	public float getRayIntersectionT(Tuple3f pos, Tuple3f dir) {
-		float dominator = ( N.x*dir.x + N.y*dir.y + N.z*dir.z );
-		if (dominator == 0)	return Float.MAX_VALUE;
+		float dominator = N.dot(dir);
+		if (dominator == 0)	{
+            return Float.MAX_VALUE;
+        }
 		return - ( N.x*(pos.x-P.x) + N.y*(pos.y-P.y) + N.z*(pos.z-P.z) ) / dominator;
    				
 	}
@@ -240,27 +239,23 @@ public class Plane implements Serializable {
 	 * @return the intersection point between this plane and the ray (pos, dir),
 	 *         or null if no intersection is found
 	 */
-	public Vector3f getRayIntersection(Tuple3f pos, Tuple3f dir) {
+	public Vec3 getRayIntersection(Tuple3f pos, Tuple3f dir) {
 		float t = getRayIntersectionT(pos, dir);
 		if (t < 0 || Float.isInfinite(t)) {
 			System.out.println("Plane.getRayIntersection("+pos+", " + dir + "). t is infinite or less than zero:" + t);
 			return null;
 		}
-		
-		Vector3f tuple = new Vector3f();
-		tuple.scaleAdd(t, dir, pos);
-		return tuple;
+
+        return new Vec3().scaleAdd_(t, dir, pos);
 	}
 	
 	/** Gets the pos projected down on this plane.
 	 * @param pos the position to project.
 	 * @return the projected position of pos down on this plane.
 	 */
-	public Vector3f getProjected(Tuple3f pos) {
+	public Vec3 getProjected(Tuple3f pos) {
 		float t = getRayIntersectionT(pos, N);
-		Vector3f tuple = new Vector3f();
-		tuple.scaleAdd(t, N, pos);
-		return tuple;
+		return new Vec3().scaleAdd_(t, N, pos);
 	}
 
 	/**
@@ -270,14 +265,14 @@ public class Plane implements Serializable {
 	 */
 	public boolean equals(Plane plane) {
 		if (lieOn(plane.getPosition()))	{
-			Vector3f v1 = new Vector3f(plane.getNormal());
-			Vector3f v2 = new Vector3f(getNormal());
-			v1.normalize();
+			Vec3 v1 = new Vec3(plane.getNormal()).normalize_();
+			Vec3 v2 = new Vec3(getNormal());
 			v2.negate();
 			v2.sub(v1);
 			float distance = v2.length();
-			if (Math.abs(distance) < equalityTolerance)
-				return true;
+			if (Math.abs(distance) < equalityTolerance) {
+                return true;
+            }
 		}
 
 		return false;
@@ -287,8 +282,8 @@ public class Plane implements Serializable {
 	/** Gets this plane transformed by the spesified matrix
 	 */
 	public Plane getTransformed(Matrix4f m) {
-		Vector3f p1 = new Vector3f(P);
-		Vector3f p2 = new Vector3f(P);
+		Vec3 p1 = new Vec3(P);
+		Vec3 p2 = new Vec3(P);
 		p2.add(N);
 		m.transform(p1);
 		m.transform(p2);
@@ -301,6 +296,7 @@ public class Plane implements Serializable {
 	 * Gets a string containing the position and normal of the plane.
 	 * @return the string
 	 */
+    @Override
 	public String toString() {
 		return "Plane [Pos=" + P + " Normal=" + N + "]";
 	}
