@@ -89,9 +89,14 @@ public class Shape implements Serializable {
 	 * Constructs a new Shape.
 	 */
 	public Shape() {
-		modelMatrix.setIdentity();
-		state.owners.add(this);
+        this(null);
 	}
+
+    public Shape(VertexData vertexData) {
+        modelMatrix.setIdentity();
+        state.owners.add(this);
+        setVertexData(vertexData);
+    }
 	
 	/**
 	 * Sets the vertex data.
