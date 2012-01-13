@@ -76,8 +76,7 @@ public class TexturedQuad {
         shape.getState().setUnit(0, new Unit(texture));
 
         renderPass.getRootNode().addShape(shape);
-        SceneGraph sceneGraph = new SceneGraph(renderPass);
-        Renderer renderer = new Renderer(sceneGraph);
+        Renderer renderer = new Renderer(new SceneGraph(renderPass));
 
         while (!Display.isCloseRequested()) {
             renderer.render();
