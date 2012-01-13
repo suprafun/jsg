@@ -33,8 +33,9 @@
 package trb.jsg;
 
 import java.io.Serializable;
-import javax.vecmath.Matrix4f;
+import javax.vecmath.Point3f;
 import javax.vecmath.Tuple3f;
+import trb.jsg.util.Mat4;
 import trb.jsg.util.Vec3;
 
 /**
@@ -48,7 +49,7 @@ public class Plane implements Serializable {
 	private static final long serialVersionUID = 0L;
 	
 	/** A position on the Plane */
-	public Vec3 P = new Vec3();
+	public Point3f P = new Point3f();
 	
 	/** The Plane normal */
 	public Vec3 N = new Vec3();
@@ -281,7 +282,7 @@ public class Plane implements Serializable {
 	
 	/** Gets this plane transformed by the spesified matrix
 	 */
-	public Plane getTransformed(Matrix4f m) {
+	public Plane getTransformed(Mat4 m) {
 		Vec3 p1 = new Vec3(P);
 		Vec3 p2 = new Vec3(P);
 		p2.add(N);

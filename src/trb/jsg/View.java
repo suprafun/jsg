@@ -33,8 +33,11 @@
 package trb.jsg;
 
 import java.io.Serializable;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Point3f;
+import javax.vecmath.Tuple3f;
 
-import javax.vecmath.*;
+import trb.jsg.util.Mat4;
 
 
 /**
@@ -55,11 +58,11 @@ public class View implements Serializable {
     private float far = 0;
 	
 	// defines the viewing volume
-	private Matrix4f projectionMatrix;
+	private Mat4 projectionMatrix;
 	
 	// the location of the view
-	private Matrix4f cameraMatrix = new Matrix4f();
-	private Matrix4f cameraMatrixInverted = new Matrix4f();
+	private Mat4 cameraMatrix = new Mat4();
+	private Mat4 cameraMatrixInverted = new Mat4();
 	
 	/** 
 	 * The view frustum planes in local (view) space. Is updated in
@@ -78,8 +81,6 @@ public class View implements Serializable {
 	 * Default constructor.
 	 */
 	public View() {
-		getCameraMatrix().setIdentity();
-		cameraMatrixInverted.setIdentity();
 		for (int i=0; i<worldPlanes.length; i++) {
 			worldPlanes[i] = new Plane();
 		}
@@ -127,7 +128,7 @@ public class View implements Serializable {
 		p.m23 = -(2*f*n)/(f-n);
 		p.m32 = -1;
 		p.m33 = 0;
-		projectionMatrix = p;
+		projectionMatrix = new Mat4(p);
 		
 		// create the planes of the camera
 		Tuple3f origo = new Point3f();
@@ -175,7 +176,7 @@ public class View implements Serializable {
 		p.m23 = (f+n)/(f-n);
 		p.m32 = 0;
 		p.m33 = 1;
-		projectionMatrix = p;
+		projectionMatrix = new Mat4(p);
 		
 		// create the planes of the camera
 		planes[0] = new Plane(new Point3f(0,0,-n), new Point3f(0,0,-1));
@@ -205,7 +206,7 @@ public class View implements Serializable {
 	 * @param center3f where the view space center of bounding box is stored
 	 * @return true if BoundingSphere is inside frustum
 	 */
-	public boolean isInsideFrustum(Matrix4f modelViewMatrix, BoundingSphere boundingSphere, Point3f center3f) {
+	public boolean isInsideFrustum(Mat4 modelViewMatrix, BoundingSphere boundingSphere, Point3f center3f) {
         if (useFrustumCulling) {
             center3f.set(boundingSphere.getCenter());
             modelViewMatrix.transform(center3f);
@@ -355,7 +356,7 @@ public class View implements Serializable {
 	 * Gets the projection matrix.
 	 * @return the projectionMatrix
 	 */
-	public Matrix4f getProjectionMatrix() {
+	public Mat4 getProjectionMatrix() {
 		return projectionMatrix;
 	}
 
@@ -363,7 +364,7 @@ public class View implements Serializable {
 	 * Sets the camera matrix.
 	 * @param cameraMatrix the cameraMatrix to set
 	 */
-	public void setCameraMatrix(Matrix4f cameraMatrix) {
+	public void setCameraMatrix(Mat4 cameraMatrix) {
 		this.cameraMatrix = cameraMatrix;
 	}
 
@@ -371,7 +372,7 @@ public class View implements Serializable {
 	 * Gets the camera matrix.
 	 * @return the cameraMatrix
 	 */
-	public Matrix4f getCameraMatrix() {
+	public Mat4 getCameraMatrix() {
 		return cameraMatrix;
 	}
 

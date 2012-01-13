@@ -36,7 +36,6 @@ import java.nio.FloatBuffer;
 
 import javax.vecmath.Color3f;
 import javax.vecmath.Color4f;
-import javax.vecmath.Matrix4f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
@@ -53,6 +52,7 @@ import trb.jsg.Uniform;
 import trb.jsg.Unit;
 import trb.jsg.enums.*;
 import trb.jsg.util.GLUtils;
+import trb.jsg.util.Mat4;
 
 /**
  * Wraps the OpenGL state. A diff can be used to only apply the state that has 
@@ -82,7 +82,7 @@ class GLState {
 	public static long clientState = 0;
 	public static long textureUnitEnable = 0;
 	
-	public static Matrix4f modelWorldMatrix = new Matrix4f();
+	public static Mat4 modelWorldMatrix = new Mat4();
 	
 	public static TextureUnitState[] glUnits;
 	

@@ -36,8 +36,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
 
 import org.lwjgl.opengl.GL11;
@@ -46,6 +44,7 @@ import org.lwjgl.opengl.GL20;
 
 import trb.jsg.*;
 import trb.jsg.peers.*;
+import trb.jsg.util.Mat4;
 import trb.jsg.util.ObjectArray;
 
 /**
@@ -182,7 +181,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 	/**
 	 * Draws the shape using immediate mode calls.
 	 */
-	public void drawImmediate(Matrix4f localToWorldMatrix) {
+	public void drawImmediate(Mat4 localToWorldMatrix) {
 		FloatBuffer coords = vertexData.coordinates;
 		FloatBuffer colors = vertexData.colors;
 		FloatBuffer normals = vertexData.normals;
@@ -258,7 +257,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 	 * @param localToWorldMatrix the local to world matrix
 	 * @return the bounding box in world space
 	 */
-	public BoundingBox calculateBoundingBox(Matrix4f localToWorldMatrix) {
+	public BoundingBox calculateBoundingBox(Mat4 localToWorldMatrix) {
 		Point3f lower = new Point3f(Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE);
 		Point3f upper = new Point3f(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
 		FloatBuffer coords = vertexData.coordinates;

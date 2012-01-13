@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.vecmath.Matrix4f;
+import trb.jsg.util.Mat4;
 
 
 /**
@@ -53,10 +54,10 @@ public class TreeNode implements Serializable {
 	protected TreeNode parent = null;
 	
 	/** The nodes transform */
-	protected Matrix4f transform = new Matrix4f();
+	protected Mat4 transform = new Mat4();
 
 	/** The local to world matrix of the node */
-	protected Matrix4f localToWorld = new Matrix4f();
+	protected Mat4 localToWorld = new Mat4();
 	
 	/** Optimization is done if transform is identity matrix */
 	protected boolean isIdentity = true;
@@ -77,14 +78,13 @@ public class TreeNode implements Serializable {
 	 * Constructs a node with no children or shapes and an identity matrix.
 	 */
 	public TreeNode() {
-		transform.setIdentity();
 	}
 	
 	/**
 	 * Sets the nodes transform matrix by copy.
 	 * @param newTransform the new transform
 	 */
-	public void setTransform(Matrix4f newTransform) {
+	public void setTransform(Mat4 newTransform) {
 		transform.set(newTransform);
 		isIdentity = false;		
 		
@@ -111,7 +111,7 @@ public class TreeNode implements Serializable {
 	 * Gets a reference to the transform matrix.
 	 * @return the transform matrix
 	 */
-	public Matrix4f getTransform() {
+	public Mat4 getTransform() {
 		return transform;
 	}
 	

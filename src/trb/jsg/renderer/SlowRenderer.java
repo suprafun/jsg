@@ -34,12 +34,12 @@ package trb.jsg.renderer;
 
 import java.util.ArrayList;
 
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Point3f;
 
 import trb.jsg.Shape;
 import trb.jsg.View;
 import trb.jsg.util.GLUtils;
+import trb.jsg.util.Mat4;
 
 /**
  * Renders a list of Shapes in the easiest, slowest and safest way possible.
@@ -56,11 +56,10 @@ class SlowRenderer {
 		this.renderPassPeer = renderPassPeer;
 	}
 	
-	public void render(Matrix4f currentMatrix) {
+	public void render(Mat4 currentMatrix) {
 		View view = renderPassPeer.renderPass.getView();
 
-		Matrix4f modelViewMatrix = new Matrix4f();
-		modelViewMatrix.set(renderPassPeer.renderPass.getView().getCameraMatrix());
+		Mat4 modelViewMatrix = new Mat4(renderPassPeer.renderPass.getView().getCameraMatrix());
 		modelViewMatrix.mul(currentMatrix);
 		
 		for (int shapeIdx=0; shapeIdx<shapes.size(); shapeIdx++) {
@@ -81,7 +80,7 @@ class SlowRenderer {
 				continue;
 			}
 			if (matrixChanged) {
-				GLUtils.loadMatrix(modelViewMatrix);
+				GLUtils.loadMatrix(new Mat4(modelViewMatrix));
 			}
 			
 			GLState.applyDif(shape);
