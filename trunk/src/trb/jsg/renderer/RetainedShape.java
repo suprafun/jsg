@@ -192,7 +192,7 @@ class RetainedShape implements ShapePeer {
 		if (oldShader != null) {
 			RetainedShader simpleShaderPeer = (RetainedShader) oldShader.getShaderProgram().nativePeer;
 			simpleShaderPeer.parents.remove(shape);
-			if (simpleShaderPeer.parents.size() == 0) {
+			if (simpleShaderPeer.parents.isEmpty()) {
 				// destroy shader in render
 				renderPassPeer.destroyList.add(simpleShaderPeer);
 				oldShader.getShaderProgram().nativePeer = null;
@@ -236,7 +236,7 @@ class RetainedShape implements ShapePeer {
 			if (!simpleTexturePeer.parents.remove(shape)) {
 				System.err.println("SimpleShapePeer.textureChanged FAILED to remove parent!!");
 			}
-			if (simpleTexturePeer.parents.size() == 0) {
+			if (simpleTexturePeer.parents.isEmpty()) {
 				// destroy texture in render
 				renderer.destroyList.add(simpleTexturePeer);
 				oldTexture.nativePeer = null;
@@ -283,7 +283,7 @@ class RetainedShape implements ShapePeer {
 			RetainedVertexData peer = (RetainedVertexData) oldVertexData.nativePeer;
 			peer.removeListUser(this);
 			peer.parents.remove(shape);
-			if (peer.parents.size() == 0) {
+			if (peer.parents.isEmpty()) {
 				oldVertexData.nativePeer = null;
 			}
 		}
