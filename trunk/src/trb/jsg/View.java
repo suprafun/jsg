@@ -397,4 +397,10 @@ public class View implements Serializable {
         view.ortho(l, r, t, b, n, f);
         return view;
     }
+
+    public static View createPerspective(float fovYRad, float aspect, float near, float far) {
+        View view = new View();
+        view.perspective(fovYRad, aspect, near, far);
+        return view;        
+    }
 }
