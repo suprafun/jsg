@@ -34,8 +34,6 @@ package trb.jsg.examples;
 
 import java.awt.Rectangle;
 import java.nio.ByteBuffer;
-import javax.vecmath.Color4f;
-import javax.vecmath.Matrix4f;
 import org.lwjgl.BufferUtils;
 
 import org.lwjgl.opengl.Display;
@@ -46,13 +44,12 @@ import trb.jsg.RenderPass;
 import trb.jsg.SceneGraph;
 import trb.jsg.Shape;
 import trb.jsg.Texture;
-import trb.jsg.TreeNode;
 import trb.jsg.Unit;
-import trb.jsg.VertexData;
 import trb.jsg.View;
 import trb.jsg.enums.Format;
 import trb.jsg.enums.TextureType;
 import trb.jsg.renderer.Renderer;
+import trb.jsg.util.geometry.VertexDataUtils;
 
 /**
  * Example of updating part of a texture.
@@ -71,13 +68,7 @@ public class DirtyRectangles {
         Texture texture = new Texture();
         texture.setTextureData(TextureType.TEXTURE_2D, 4, 256, 256, 0, Format.BGRA, pixels, false);
 
-        // a simple triangle
-        Shape shape = new Shape(new VertexData(
-                new float[]{100, 100, 0, 100, 400, 0, 400, 400, 0, 400, 100, 0} // coordinates
-                , null, null, 2
-                , new float[][]{{0, 0,  0, 1,   1, 1,   1, 0}}
-                , new int[]{0, 1, 2,  2, 3, 0} // indices
-                ));
+        Shape shape = new Shape(VertexDataUtils.createQuad(0, 0, 640, 480, 0));
         shape.getState().setUnit(0, new Unit(texture));
 
         // add shape to the renderpass tree
@@ -85,7 +76,6 @@ public class DirtyRectangles {
         SceneGraph sceneGraph = new SceneGraph(renderPass);
         Renderer renderer = new Renderer(sceneGraph);
 
-        // main game loop
         while (!Display.isCloseRequested()) {
             // Fill texture buffer with a pattern that changes color over time.
             byte c = (byte) (System.currentTimeMillis() / 5l);
@@ -104,5 +94,7 @@ public class DirtyRectangles {
             renderer.render();
             Display.update();
         }
+
+        Display.destroy();
     }
 }
