@@ -77,6 +77,14 @@ public class VertexData implements Serializable {
 	transient private BoundingSphere boundingSphere;
 	
 	transient public VertexDataPeer nativePeer;
+
+    public VertexData() {
+        
+    }
+
+    public VertexData(float[] coordinates, float[] normals, float[] colors, int texCoordElementSize, float[][] texCoords, int[] indices) {
+        setCoordinates(coordinates, normals, colors, texCoordElementSize, texCoords, indices);
+    }
 	
 	public void setCoordinates(float[] coordinates, float[] normals, float[] colors
 			, int texCoordElementSize, float[][] texCoords, int[] indices) {
