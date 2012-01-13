@@ -153,7 +153,7 @@ public class TreeNode implements Serializable {
 			// detach descendant Shapes
 			RootNode root = getRoot();
 			if (root != null) {
-				ArrayList<Shape> allShapes = getAllShapesInTree();
+				ArrayList<Shape> allShapes = child.getAllShapesInTree();
 				for (int i=0; i<allShapes.size(); i++) {
 					Shape shape = allShapes.get(i);
 					root.renderPass.removeShape(shape);
