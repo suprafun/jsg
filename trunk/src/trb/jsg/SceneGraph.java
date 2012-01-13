@@ -54,6 +54,21 @@ public class SceneGraph implements Serializable {
 	
 	/** The native peer */
 	transient public SceneGraphPeer nativePeer;
+
+    public SceneGraph() {
+
+    }
+
+    public SceneGraph(RenderPass renderPass) {
+        addRenderPass(renderPass);
+    }
+
+    /**
+     * Adds the RenderPass at the end.
+     */
+    public void addRenderPass(RenderPass renderPass) {
+        insertRenderPass(renderPass, renderPasses.size());
+    }
 	
 	/**
 	 * Inserts the RenderPass at the specified index
