@@ -198,8 +198,6 @@ public class TreeNode implements Serializable {
 		RootNode root = getRoot();
 		if (root != null) {
 			root.renderPass.addShape(shape);
-		} else {
-//			Thread.dumpStack();
 		}
 		flagAsDirty();
 	}
@@ -210,6 +208,11 @@ public class TreeNode implements Serializable {
 	 */
 	public void removeShape(Shape shape) {
 		shapes.remove(shape);
+        RootNode root = getRoot();
+        if (root != null) {
+            root.renderPass.removeShape(shape);
+        }
+        flagAsDirty();
 	}
 	
 	/**
