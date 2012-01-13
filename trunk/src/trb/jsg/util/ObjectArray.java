@@ -167,8 +167,9 @@ public class ObjectArray<E> implements Serializable {
 	 * Gets wich elements are used.
 	 * @return a string description of this object 
 	 */
+    @Override
 	public String toString() {
-		StringBuffer str = new StringBuffer(array.length);
+		StringBuilder str = new StringBuilder(array.length);
 		for (int i=0; i<array.length; i++) {
 			str.append(array[i] != null ? "1" : (i >= length ? "?" : "0"));
 		}
