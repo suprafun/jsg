@@ -63,7 +63,7 @@ public class SharedDepthBuffer {
         Display.create();
 
         View view = View.createPerspective((float) Math.toRadians(45), 640 / (float) 480, 1, 1000);
-        view.setCameraMatrix(new Mat4().translate(0, 0, -30).rotateEulerDeg(45, 0, 0).getMatrix4f());
+        view.setCameraMatrix(new Mat4().translate(0, 0, -30).rotateEulerDeg(45, 0, 0));
 
         DepthBuffer depthBuffer = new DepthBuffer();
 
@@ -109,7 +109,7 @@ public class SharedDepthBuffer {
             float time = (System.currentTimeMillis() - startTime) / 1000f;
 
             // animate object back and forth
-            shape2.setModelMatrix(new Mat4().translate(Math.sin(time) * 10, 0, 0).getMatrix4f());
+            shape2.setModelMatrix(new Mat4().translate(Math.sin(time) * 10, 0, 0));
 
             renderer.render();
             Display.update();

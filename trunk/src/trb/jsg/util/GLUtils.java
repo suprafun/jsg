@@ -54,7 +54,12 @@ public class GLUtils {
 	private static FloatBuffer matrixBuf = BufferUtils.createFloatBuffer(16);
 	private static IntBuffer getIntBuf = BufferUtils.createIntBuffer(16);
 	private static FloatBuffer getFloatBuf = BufferUtils.createFloatBuffer(16);
-	
+
+    public static void loadMatrix(Mat4 m) {
+        loadMatrix(m.getMatrix4f());
+
+    }
+
 	/**
 	 * Loads a Matrix4f into opengl.
 	 * @param m4f the matrix to load
