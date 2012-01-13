@@ -72,8 +72,7 @@ public class DirtyRectangles {
 
         // add shape to the renderpass tree
         renderPass.getRootNode().addShape(shape);
-        SceneGraph sceneGraph = new SceneGraph(renderPass);
-        Renderer renderer = new Renderer(sceneGraph);
+        Renderer renderer = new Renderer(new SceneGraph(renderPass));
 
         while (!Display.isCloseRequested()) {
             // Fill texture buffer with a pattern that changes color over time.
