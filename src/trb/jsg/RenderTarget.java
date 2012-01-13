@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Java Scene Graph
+ * Copyright (c) 2008-2012 Java Scene Graph
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -13,8 +13,8 @@
  *   notice, this list of conditions and the following disclaimer in the
  *   documentation and/or other materials provided with the distribution.
  *
- * * Neither the name of 'jMonkeyEngine' nor the names of its contributors 
- *   may be used to endorse or promote products derived from this software 
+ * * Neither the name of 'Java Scene Graph' nor the names of its contributors
+ *   may be used to endorse or promote products derived from this software
  *   without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -61,8 +61,8 @@ public class RenderTarget implements Serializable {
 	/** The size of the render target.*/
 	private int height;
 	
-	/** Whether or not depth buffer will be attached */
-	private boolean attachDepthBuffer = true;
+    /** The depth buffer to attach, if any. */
+    private DepthBuffer depthBuffer;
 	
 	/** Whether or not to generate mipmaps */
 	private boolean generateMipMap = false;
@@ -77,17 +77,17 @@ public class RenderTarget implements Serializable {
 	 * Construct a render target with the specified size, flags and textures. 
 	 * @param width the width
 	 * @param height the height
-	 * @param attachDepthBuffer true to attach a depth buffer
+	 * @param depthBuffer the depth buffer to attach or null to not attach.
 	 * @param generateMipMap true to generate mipmaps
 	 * @param colorAttachments the textures to render to
 	 */
-	public RenderTarget(int width, int height, boolean attachDepthBuffer
+	public RenderTarget(int width, int height, DepthBuffer depthBuffer
 			, boolean generateMipMap, Texture... colorAttachments) {
 		this.width = width;
 		this.height = height;
+        this.depthBuffer = depthBuffer;
 		this.colorAttachments = colorAttachments;
 		this.generateMipMap = generateMipMap;
-		this.attachDepthBuffer = attachDepthBuffer;
 	}
 
 	/**
@@ -106,13 +106,12 @@ public class RenderTarget implements Serializable {
 		return height;
 	}
 
-	/**
-	 * Checks depth buffer will be attached.
-	 * @return the attachDepthBuffer flag
-	 */
-	public boolean isAttachDepthBuffer() {
-		return attachDepthBuffer;
-	}
+    /**
+     * Gets the depth buffer.
+     */
+    public DepthBuffer getDepthBuffer() {
+        return depthBuffer;
+    }
 
 	/**
 	 * Checks if mipmap will be generated.

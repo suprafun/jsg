@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008 Java Scene Graph
+ * Copyright (c) 2008-2012 Java Scene Graph
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -13,8 +13,8 @@
  *   notice, this list of conditions and the following disclaimer in the
  *   documentation and/or other materials provided with the distribution.
  *
- * * Neither the name of 'jMonkeyEngine' nor the names of its contributors 
- *   may be used to endorse or promote products derived from this software 
+ * * Neither the name of 'Java Scene Graph' nor the names of its contributors
+ *   may be used to endorse or promote products derived from this software
  *   without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -40,6 +40,7 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.Util;
+import trb.jsg.DepthBuffer;
 
 import trb.jsg.RenderTarget;
 import trb.jsg.Texture;
@@ -49,9 +50,6 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 
 	/** The opengl fbo id */
 	public IntBuffer fboId = BufferUtils.createIntBuffer(1);
-
-	/** Depth buffer id */
-	private IntBuffer depthbufferId = BufferUtils.createIntBuffer(1);
 	
 	/** What fbo color attachments to render */
 	private IntBuffer drawBuffers; 
@@ -59,10 +57,6 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 	/** The peers render target */
 	public RenderTarget renderTarget;
 	
-	/**
-	 * 
-	 * @param renderTarget
-	 */
 	public RetainedRenderTarget(RenderTarget renderTarget) {
 		this.renderTarget = renderTarget;
 		drawBuffers = BufferUtils.createIntBuffer(Math.min(RetainedSceneGraph.maxDrawBuffers, renderTarget.getColorAttachments().length));
@@ -73,19 +67,26 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 	}
 
 	/**
-	 * Implements SimpleNativeResource
+	 * Implements NativeResource
 	 */
 	public void destroyNativeResource() {
 		System.out.println(getClass().getSimpleName()+".destroyNativeResource()");
-		if (depthbufferId.get(0) > 0) {
-			depthbufferId.rewind();
-			glDeleteRenderbuffersEXT(depthbufferId);
-			System.out.println("SimpleRenderTargetPeer destroy depth buffer id="+depthbufferId.get(0));
-		}
+        DepthBuffer depthBuffer = renderTarget.getDepthBuffer();
+        if (depthBuffer != null && depthBuffer.nativePeer instanceof RetainedDepthBuffer) {
+            RetainedDepthBuffer retainedDepthBuffer = (RetainedDepthBuffer) depthBuffer.nativePeer;
+            retainedDepthBuffer.parents.remove(renderTarget);
+            if (retainedDepthBuffer.parents.isEmpty()) {
+                IntBuffer id = retainedDepthBuffer.depthBufferId;
+                id.rewind();
+                glDeleteRenderbuffersEXT(id);
+                depthBuffer.nativePeer = null;
+                System.out.println(this + " destroy depth buffer id=" + id.get(0));
+            }
+        }
 		if (fboId.get(0) > 0) {
 			fboId.rewind();
 			glDeleteFramebuffersEXT(fboId);
-			System.out.println("SimpleRenderTargetPeer destroy fbo buffer id="+fboId.get(0));
+			System.out.println(this + " destroy fbo buffer id="+fboId.get(0));
 		}
 		for (Texture colorAttachment : renderTarget.getColorAttachments()) {
 			if (colorAttachment.nativePeer != null) {
@@ -96,22 +97,35 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 	}
 
 	/**
-	 * Implements SimpleNativeResource
+	 * Implements NativeResource
 	 */
 	public void updateNativeResource() {
-		System.out.println(getClass().getSimpleName()+".updateNativeResource()");
+		System.err.println(this+".updateNativeResource()");
 		if (fboId.get(0) <= 0) {
 			glGenFramebuffersEXT(fboId);
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId.get(0));
-			
-			if (renderTarget.isAttachDepthBuffer()) {
-				// add depth buffer
-				glGenRenderbuffersEXT(depthbufferId);
-				glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthbufferId.get(0));
-				glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, renderTarget.getWidth(), renderTarget.getHeight());
-				glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthbufferId.get(0));
-			}
-			
+
+            DepthBuffer depthBuffer = renderTarget.getDepthBuffer();
+            if (depthBuffer != null) {
+                if (depthBuffer.nativePeer == null) {
+                    depthBuffer.nativePeer = new RetainedDepthBuffer();
+                }
+                if (depthBuffer.nativePeer instanceof RetainedDepthBuffer) {
+                    RetainedDepthBuffer retainedDepthBuffer = (RetainedDepthBuffer) depthBuffer.nativePeer;
+                    retainedDepthBuffer.parents.add(renderTarget);
+                    IntBuffer id = retainedDepthBuffer.depthBufferId;
+                    if (id.get(0) <= 0) {
+                        id.rewind();
+                        glGenRenderbuffersEXT(id);
+                        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, id.get(0));
+                        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, renderTarget.getWidth(), renderTarget.getHeight());
+                    } else {
+                        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, id.get(0));
+                    }
+                    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, id.get(0));
+                }
+            }
+
 			for (Texture colorAttachment : renderTarget.getColorAttachments()) {
 				if (colorAttachment != null) {
 					// add a texture
