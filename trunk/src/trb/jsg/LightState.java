@@ -37,9 +37,9 @@ import java.io.Serializable;
 import javax.vecmath.Color3f;
 import javax.vecmath.Point4f;
 import javax.vecmath.Tuple3f;
-import javax.vecmath.Vector3f;
 
 import trb.jsg.util.ObjectArray;
+import trb.jsg.util.Vec3;
 
 public class LightState implements Serializable {
 
@@ -89,7 +89,7 @@ public class LightState implements Serializable {
 		public Color3f diffuse = new Color3f(1, 1, 1);
 		public Color3f specular = new Color3f(0, 0, 0);
 		public Point4f position = new Point4f(0, 0, 1, 0);
-		public Vector3f spotDirection = new Vector3f(0, 0, -1);
+		public Vec3 spotDirection = new Vec3(0, 0, -1);
 		/** [0, 180] */
 		public float spotExponent = 0;
 		/** [0, 90] and 180 */

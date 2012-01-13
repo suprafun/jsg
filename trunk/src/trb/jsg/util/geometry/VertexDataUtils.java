@@ -2,8 +2,9 @@ package trb.jsg.util.geometry;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import javax.vecmath.Vector3f;
+import javax.vecmath.Tuple3f;
 import trb.jsg.VertexData;
+import trb.jsg.util.Vec3;
 
 public class VertexDataUtils {
 
@@ -33,17 +34,17 @@ public class VertexDataUtils {
         return new VertexData(coords, normals, colors, 2, texCoords, indices);
     }
     
-    public static VertexData createBox(Vector3f min, Vector3f max) {
-        Vector3f verts[] = new Vector3f[8];
-        verts[0] = new Vector3f(min.x, min.y, min.z);
-        verts[1] = new Vector3f(max.x, min.y, min.z);
-        verts[2] = new Vector3f(max.x, max.y, min.z);
-        verts[3] = new Vector3f(min.x, max.y, min.z);
+    public static VertexData createBox(Tuple3f min, Tuple3f max) {
+        Vec3 verts[] = new Vec3[8];
+        verts[0] = new Vec3(min.x, min.y, min.z);
+        verts[1] = new Vec3(max.x, min.y, min.z);
+        verts[2] = new Vec3(max.x, max.y, min.z);
+        verts[3] = new Vec3(min.x, max.y, min.z);
 
-        verts[4] = new Vector3f(max.x, min.y, max.z);
-        verts[5] = new Vector3f(min.x, min.y, max.z);
-        verts[6] = new Vector3f(max.x, max.y, max.z);
-        verts[7] = new Vector3f(min.x, max.y, max.z);
+        verts[4] = new Vec3(max.x, min.y, max.z);
+        verts[5] = new Vec3(min.x, min.y, max.z);
+        verts[6] = new Vec3(max.x, max.y, max.z);
+        verts[7] = new Vec3(min.x, max.y, max.z);
 
         int[] sides = new int[]{
             0, 1, 2, 3 // back
