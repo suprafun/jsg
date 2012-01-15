@@ -50,7 +50,7 @@ public class HelloWorld {
         RenderPass renderPass = new RenderPass();
         renderPass.setClearMask(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         renderPass.setView(View.createOrtho(0, 640, 0, 480, -1000, 1000));
-        renderPass.getRootNode().addShape(new Shape(VertexDataUtils.createQuad(100, 100, 300, 300, 0)));
+        renderPass.addShape(new Shape(VertexDataUtils.createQuad(100, 100, 300, 300, 0)));
         Renderer renderer = new Renderer(new SceneGraph(renderPass));
 
         while (!Display.isCloseRequested()) {
