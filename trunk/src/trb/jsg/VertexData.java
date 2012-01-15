@@ -137,18 +137,19 @@ public class VertexData implements Serializable {
 		this.indices.rewind();
 		this.indices.put(indices).flip();
 
-		if (nativePeer != null) {
-			nativePeer.vertexDataChanged();
-		}
-		calculateBounds();
+        changed();
 	}
+
+    public void changed() {
+        if (nativePeer != null) {
+            nativePeer.vertexDataChanged();
+        }
+        calculateBounds();
+    }
 	
 	public void setCoordinates(FloatBuffer coordinates) {
 		this.coordinates = coordinates;
-		if (nativePeer != null) {
-			nativePeer.vertexDataChanged();
-		}
-		calculateBounds();
+        changed();
 	}
 	
 	/**
