@@ -397,8 +397,6 @@ class StateSortRenderer {
 			} else if (matrixChanged) {
 				DisplayListBatch.flush();
 			}
-			
-			System.out.println("a");
 
 			peer.draw();
 			// 155 fps (data is in buffers)
