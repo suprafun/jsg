@@ -32,16 +32,22 @@
 
 package trb.jsg.enums;
 
-import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL14.*;
 
-public enum CullFace {
-	FRONT(GL11.GL_FRONT),
-	BACK(GL11.GL_BACK),
-	FRONT_AND_BACK(GL11.GL_FRONT_AND_BACK);
+public enum StencilAction {
+	KEEP(GL_KEEP),
+    ZERO(GL_ZERO),
+    REPLACE(GL_REPLACE),
+    INCR(GL_INCR),
+    INCR_WRAP(GL_INCR_WRAP),
+    DECR(GL_DECR),
+    DECR_WRAP(GL_DECR_WRAP),
+    INVERT(GL_INVERT);
 	
 	private int val;
 	
-	private CullFace(int val) {
+	private StencilAction(int val) {
 		this.val = val;
 	}
 	

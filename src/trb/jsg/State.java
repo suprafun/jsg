@@ -37,15 +37,16 @@ import java.util.ArrayList;
 
 import javax.vecmath.Color3f;
 import javax.vecmath.Color4f;
+import org.lwjgl.opengl.GL20;
 
 import trb.jsg.enums.AlphaTestFunc;
 import trb.jsg.enums.BlendDstFunc;
 import trb.jsg.enums.BlendSrcFunc;
-import trb.jsg.enums.CullFace;
+import trb.jsg.enums.Face;
 import trb.jsg.enums.DepthFunc;
 import trb.jsg.enums.FrontFace;
 import trb.jsg.enums.StencilFunc;
-import trb.jsg.enums.StencilOp;
+import trb.jsg.enums.StencilAction;
 import trb.jsg.util.Hash;
 import trb.jsg.util.ObjectArray;
 
@@ -78,7 +79,7 @@ public class State implements Serializable {
 	
 	// culling state
 	private boolean cullEnabled = false;
-	private CullFace cullFace = CullFace.BACK;
+	private Face cullFace = Face.BACK;
 	private FrontFace frontFace = FrontFace.CCW;
 	
 	// transparency state
@@ -97,20 +98,14 @@ public class State implements Serializable {
 	private boolean depthWriteEnabled = true;
 	
 	private boolean stencilTestEnabled = false;
-	private StencilFunc stencilFuncFront = StencilFunc.ALWAYS;
-	private int stencilRefFront = 0;
-	private int stencilMaskFront = 0xff;
-	private int stencilWriteMaskFront = 0xff;
-	private StencilOp stencilFailFront = StencilOp.KEEP;
-	private StencilOp stencilDepthFailFront = StencilOp.KEEP;
-	private StencilOp stencilDepthPassFront = StencilOp.KEEP;
-	private StencilFunc stencilFuncBack = StencilFunc.ALWAYS;
-	private int stencilRefBack = 0;
-	private int stencilMaskBack = 0xff;
-	private int stencilWriteMaskBack = 0xff;
-	private StencilOp stencilFailBack = StencilOp.KEEP;
-	private StencilOp stencilDepthFailBack = StencilOp.KEEP;
-	private StencilOp stencilDepthPassBack = StencilOp.KEEP;
+    public static final StencilFuncParams DEFAULT_STENCIL_FUNC = new StencilFuncParams();
+    public static final StencilOpParams DEFAULT_STENCIL_OP = new StencilOpParams();
+    private StencilFuncParams stencilFuncFront = DEFAULT_STENCIL_FUNC;
+    private StencilFuncParams stencilFuncBack = DEFAULT_STENCIL_FUNC;
+    private StencilOpParams stencilOpFront = DEFAULT_STENCIL_OP;
+    private StencilOpParams stencilOpBack = DEFAULT_STENCIL_OP;
+    private int stencilMaskFront = 0xff;
+    private int stencilMaskBack = 0xff;
 	
 	private boolean alphaTestEnabled = false;
 	private AlphaTestFunc alphaTestFunc = AlphaTestFunc.ALWAYS;
@@ -169,20 +164,12 @@ public class State implements Serializable {
 			
 			hash.addBoolean(stencilTestEnabled);
 			if (stencilTestEnabled) {
-				hash.addInt(stencilFuncFront.get());
-				hash.addInt(stencilRefFront);
-				hash.addInt(stencilMaskFront);
-				hash.addInt(stencilWriteMaskFront);
-				hash.addInt(stencilFailFront.get());
-				hash.addInt(stencilDepthFailFront.get());
-				hash.addInt(stencilDepthPassFront.get());
-				hash.addInt(stencilFuncBack.get());
-				hash.addInt(stencilRefBack);
-				hash.addInt(stencilMaskBack);
-				hash.addInt(stencilWriteMaskBack);
-				hash.addInt(stencilFailBack.get());
-				hash.addInt(stencilDepthFailBack.get());
-				hash.addInt(stencilDepthPassBack.get());
+                stencilFuncFront.applyHash(hash);
+                stencilFuncBack.applyHash(hash);
+                stencilOpFront.applyHash(hash);
+                stencilOpBack.applyHash(hash);
+                hash.addInt(stencilMaskFront);
+                hash.addInt(stencilMaskBack);
 			}
 			hash.addBoolean(alphaTestEnabled);
 			if (alphaTestEnabled) {
@@ -339,7 +326,7 @@ public class State implements Serializable {
 	 * Sets the face culling.
 	 * @param cullFace the face to be culled
 	 */
-	public void setCullFace(CullFace cullFace) {
+	public void setCullFace(Face cullFace) {
 		if (this.cullFace != cullFace) {
 			this.cullFace = cullFace;
 			stateChanged();
@@ -350,7 +337,7 @@ public class State implements Serializable {
 	 * Gets the face culling.
 	 * @return the face culling
 	 */
-	public CullFace getCullFace() {
+	public Face getCullFace() {
 		return cullFace;
 	}
 
@@ -510,215 +497,77 @@ public class State implements Serializable {
 		return stencilTestEnabled;
 	}
 
-	/**
-	 * @param stencilFuncFront the stencilFuncFront to set
-	 */
-	public void setStencilFuncFront(StencilFunc stencilFuncFront) {
-		this.stencilFuncFront = stencilFuncFront;
+    public void setStencilFunc(StencilFuncParams params) {
+        setStencilFunc(Face.FRONT_AND_BACK, params);
+    }
+
+    public void setStencilFunc(Face face, StencilFuncParams params) {
+        if (face == Face.FRONT_AND_BACK) {
+            stencilFuncFront = params;
+            stencilFuncBack = params;
+        } else if (face == Face.FRONT) {
+            stencilFuncFront = params;
+        } else if (face == Face.BACK) {
+            stencilFuncBack = params;
+        }
 		stateChanged();
-	}
+    }
 
-	/**
-	 * @return the stencilFuncFront
-	 */
-	public StencilFunc getStencilFuncFront() {
-		return stencilFuncFront;
-	}
+    public void setStencilMask(int mask) {
+        setStencilMask(Face.FRONT_AND_BACK, mask);
+    }
 
-	/**
-	 * @param stencilRefFront the stencilRefFront to set
-	 */
-	public void setStencilRefFront(int stencilRefFront) {
-		this.stencilRefFront = stencilRefFront;
+    public void setStencilMask(Face face, int mask) {
+        if (face == Face.FRONT_AND_BACK) {
+            stencilMaskBack = mask;
+            stencilMaskFront = mask;
+        } else if (face == Face.FRONT) {
+            stencilMaskFront = mask;
+        } else if (face == Face.BACK) {
+            stencilMaskBack = mask;
+        }
 		stateChanged();
-	}
+    }
 
-	/**
-	 * @return the stencilRefFront
-	 */
-	public int getStencilRefFront() {
-		return stencilRefFront;
-	}
+    public void setStencilOp(StencilOpParams params) {
+        setStencilOp(Face.FRONT_AND_BACK, params);
+    }
 
-	/**
-	 * @param stencilMaskFront the stencilMaskFront to set
-	 */
-	public void setStencilMaskFront(int stencilMaskFront) {
-		this.stencilMaskFront = stencilMaskFront;
+    public void setStencilOp(Face face, StencilOpParams params) {
+        if (face == Face.FRONT_AND_BACK) {
+            stencilOpFront = params;
+            stencilOpBack = params;
+        } else if (face == Face.FRONT) {
+            stencilOpFront = params;
+        } else if (face == Face.BACK) {
+            stencilOpBack = params;
+        }
 		stateChanged();
-	}
+    }
 
-	/**
-	 * @return the stencilMaskFront
-	 */
-	public int getStencilMaskFront() {
-		return stencilMaskFront;
-	}
+    public StencilFuncParams getStencilFuncFront() {
+        return stencilFuncFront;
+    }
 
-	/**
-	 * @param stencilWriteMaskFront the stencilWriteMaskFront to set
-	 */
-	public void setStencilWriteMaskFront(int stencilWriteMaskFront) {
-		this.stencilWriteMaskFront = stencilWriteMaskFront;
-		stateChanged();
-	}
+    public StencilFuncParams getStencilFuncBack() {
+        return stencilFuncBack;
+    }
 
-	/**
-	 * @return the stencilWriteMaskFront
-	 */
-	public int getStencilWriteMaskFront() {
-		return stencilWriteMaskFront;
-	}
+    public StencilOpParams getStencilOpFront() {
+        return stencilOpFront;
+    }
 
-	/**
-	 * @param stencilFailFront the stencilFailFront to set
-	 */
-	public void setStencilFailFront(StencilOp stencilFailFront) {
-		this.stencilFailFront = stencilFailFront;
-		stateChanged();
-	}
+    public StencilOpParams getStencilOpBack() {
+        return stencilOpBack;
+    }
 
-	/**
-	 * @return the stencilFailFront
-	 */
-	public StencilOp getStencilFailFront() {
-		return stencilFailFront;
-	}
+    public int getStencilMaskFront() {
+        return stencilMaskFront;
+    }
 
-	/**
-	 * @param stencilDepthFailFront the stencilDepthFailFront to set
-	 */
-	public void setStencilDepthFailFront(StencilOp stencilDepthFailFront) {
-		this.stencilDepthFailFront = stencilDepthFailFront;
-		stateChanged();
-	}
-
-	/**
-	 * @return the stencilDepthFailFront
-	 */
-	public StencilOp getStencilDepthFailFront() {
-		return stencilDepthFailFront;
-	}
-
-	/**
-	 * @param stencilDepthPassFront the stencilDepthPassFront to set
-	 */
-	public void setStencilDepthPassFront(StencilOp stencilDepthPassFront) {
-		this.stencilDepthPassFront = stencilDepthPassFront;
-		stateChanged();
-	}
-
-	/**
-	 * @return the stencilDepthPassFront
-	 */
-	public StencilOp getStencilDepthPassFront() {
-		return stencilDepthPassFront;
-	}
-
-	/**
-	 * @param stencilFuncBack the stencilFuncBack to set
-	 */
-	public void setStencilFuncBack(StencilFunc stencilFuncBack) {
-		this.stencilFuncBack = stencilFuncBack;
-		stateChanged();
-	}
-
-	/**
-	 * @return the stencilFuncBack
-	 */
-	public StencilFunc getStencilFuncBack() {
-		return stencilFuncBack;
-	}
-
-	/**
-	 * @param stencilRefBack the stencilRefBack to set
-	 */
-	public void setStencilRefBack(int stencilRefBack) {
-		this.stencilRefBack = stencilRefBack;
-		stateChanged();
-	}
-
-	/**
-	 * @return the stencilRefBack
-	 */
-	public int getStencilRefBack() {
-		return stencilRefBack;
-	}
-
-	/**
-	 * @param stencilMaskBack the stencilMaskBack to set
-	 */
-	public void setStencilMaskBack(int stencilMaskBack) {
-		this.stencilMaskBack = stencilMaskBack;
-		stateChanged();
-	}
-
-	/**
-	 * @return the stencilMaskBack
-	 */
-	public int getStencilMaskBack() {
-		return stencilMaskBack;
-	}
-
-	/**
-	 * @param stencilWriteMaskBack the stencilWriteMaskBack to set
-	 */
-	public void setStencilWriteMaskBack(int stencilWriteMaskBack) {
-		this.stencilWriteMaskBack = stencilWriteMaskBack;
-		stateChanged();
-	}
-
-	/**
-	 * @return the stencilWriteMaskBack
-	 */
-	public int getStencilWriteMaskBack() {
-		return stencilWriteMaskBack;
-	}
-
-	/**
-	 * @param stencilFailBack the stencilFailBack to set
-	 */
-	public void setStencilFailBack(StencilOp stencilFailBack) {
-		this.stencilFailBack = stencilFailBack;
-		stateChanged();
-	}
-
-	/**
-	 * @return the stencilFailBack
-	 */
-	public StencilOp getStencilFailBack() {
-		return stencilFailBack;
-	}
-
-	/**
-	 * @param stencilDepthFailBack the stencilDepthFailBack to set
-	 */
-	public void setStencilDepthFailBack(StencilOp stencilDepthFailBack) {
-		this.stencilDepthFailBack = stencilDepthFailBack;
-		stateChanged();
-	}
-
-	/**
-	 * @return the stencilDepthFailBack
-	 */
-	public StencilOp getStencilDepthFailBack() {
-		return stencilDepthFailBack;
-	}
-
-	/**
-	 * @param stencilDepthPassBack the stencilDepthPassBack to set
-	 */
-	public void setStencilDepthPassBack(StencilOp stencilDepthPassBack) {
-		this.stencilDepthPassBack = stencilDepthPassBack;
-		stateChanged();
-	}
-
-	/**
-	 * @return the stencilDepthPassBack
-	 */
-	public StencilOp getStencilDepthPassBack() {
-		return stencilDepthPassBack;
-	}
+    public int getStencilMaskBack() {
+        return stencilMaskBack;
+    }
 
 	/**
 	 * @param alphaTestEnabled the alphaTestEnabled to set
@@ -914,5 +763,56 @@ public class State implements Serializable {
 			return shininess;
 		}		
 	}
-	
+
+    public static class StencilFuncParams {
+        public final StencilFunc func;
+        public final int ref;
+        public final int mask;
+
+        public StencilFuncParams() {
+            this(StencilFunc.ALWAYS, 0, 0xff);
+        }
+
+        public StencilFuncParams(StencilFunc func, int ref, int mask) {
+            this.func = func;
+            this.ref = ref;
+            this.mask = mask;
+        }
+
+        void applyHash(Hash hash) {
+            hash.addInt(func.get());
+            hash.addInt(ref);
+            hash.addInt(mask);
+        }
+
+        public void apply(Face face) {
+            GL20.glStencilFuncSeparate(face.get(), func.get(), ref, mask);
+        }
+    }
+
+    public static class StencilOpParams {
+        public final StencilAction sfail;
+        public final StencilAction dpfail;
+        public final StencilAction dppass;
+
+        public StencilOpParams() {
+            this(StencilAction.KEEP, StencilAction.KEEP, StencilAction.KEEP);
+        }
+
+        public StencilOpParams(StencilAction sfail, StencilAction dpfail, StencilAction dppass) {
+            this.sfail = sfail;
+            this.dpfail = dpfail;
+            this.dppass = dppass;
+        }
+        
+        void applyHash(Hash hash) {
+            hash.addInt(sfail.get());
+            hash.addInt(dpfail.get());
+            hash.addInt(dppass.get());
+        }
+
+        public void apply(Face face) {
+            GL20.glStencilOpSeparate(face.get(), sfail.get(), dpfail.get(), dppass.get());
+        }
+    }
 }

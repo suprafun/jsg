@@ -32,22 +32,16 @@
 
 package trb.jsg.enums;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL14.*;
+import org.lwjgl.opengl.GL11;
 
-public enum StencilOp {
-	KEEP(GL_KEEP),
-    ZERO(GL_ZERO),
-    REPLACE(GL_REPLACE),
-    INCR(GL_INCR),
-    INCR_WRAP(GL_INCR_WRAP),
-    DECR(GL_DECR),
-    DECR_WRAP(GL_DECR_WRAP),
-    INVERT(GL_INVERT);
+public enum Face {
+	FRONT(GL11.GL_FRONT),
+	BACK(GL11.GL_BACK),
+	FRONT_AND_BACK(GL11.GL_FRONT_AND_BACK);
 	
-	private int val;
+	private final int val;
 	
-	private StencilOp(int val) {
+	private Face(int val) {
 		this.val = val;
 	}
 	
