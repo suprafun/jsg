@@ -55,10 +55,15 @@ public class SceneGraph implements Serializable {
 	/** The native peer */
 	transient public SceneGraphPeer nativePeer;
 
+    /**
+     * Creates a SceneGraph with no render passes.
+     */
     public SceneGraph() {
-
     }
 
+    /**
+     * Creates a SceneGraph with one render pass.
+     */
     public SceneGraph(RenderPass renderPass) {
         addRenderPass(renderPass);
     }
