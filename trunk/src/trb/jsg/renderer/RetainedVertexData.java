@@ -324,7 +324,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 		FloatBuffer colors = vertexData.colors;
 		FloatBuffer normals = vertexData.normals;
 		ObjectArray<VertexData.TexCoordData> texCoords = vertexData.texCoords;
-		long state = 0;
+		long state = 1;
 		if (normals != null) {
 			state |= (1 << 1);
 		}
@@ -385,7 +385,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 				boolean normalized = false; // attribute.normalized
 				GL20.glEnableVertexAttribArray(loc);
 				if (attribute.data instanceof FloatBuffer) {
-					GL20.glVertexAttribPointer(loc, attribute.size, normalized, stride, (FloatBuffer) attribute.data); 
+					GL20.glVertexAttribPointer(loc, attribute.size, normalized, stride, attribute.data); 
 				} else {
 					System.err.println(getClass().getSimpleName()+" vertx attribute type not supported)");
 				}
