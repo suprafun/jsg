@@ -32,6 +32,7 @@
 
 package trb.jsg.renderer;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
 import trb.jsg.*;
 
 /**
@@ -44,6 +45,11 @@ public class Renderer {
 	
 	/** The current frame index */
 	public static int frameIdx = 0;
+    private static ConcurrentLinkedQueue<Runnable> runnables = new ConcurrentLinkedQueue();
+
+    public static void invokeLater(Runnable runnable) {
+        runnables.add(runnable);
+    }
 	
 	private RetainedSceneGraph retainedSceneGraph = null;
 
@@ -59,6 +65,11 @@ public class Renderer {
 	 * Renders the scenegraph.
 	 */
 	public void render() {
+        Runnable runnable = null;
+        while ((runnable = runnables.poll()) != null) {
+            runnable.run();
+        }
+
 		retainedSceneGraph.sceneGraph.updateTrees();
 		retainedSceneGraph.render();
 		frameIdx++;
