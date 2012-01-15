@@ -1,8 +1,6 @@
-#summary One-sentence summary of this page.
+#summary This example shows how to render a single quad in ortho mode.
 
-=Hello world exampel=
-
-This  example shows how to render a quad in ortho mode.
+=Hello world=
 
 {{{
 import org.lwjgl.opengl.*;
