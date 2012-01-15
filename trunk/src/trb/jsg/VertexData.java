@@ -46,6 +46,7 @@ import org.lwjgl.BufferUtils;
 
 import trb.jsg.peers.VertexDataPeer;
 import trb.jsg.util.ObjectArray;
+import trb.jsg.util.Vec3;
 
 /**
  * A index triangle array. The number of triangles rendered is specified by the
@@ -151,6 +152,18 @@ public class VertexData implements Serializable {
 		this.coordinates = coordinates;
         changed();
 	}
+
+    public VertexData fillColor(Vec3 color) {
+        if (colors != null) {
+            for (int i=0; i<colors.limit(); i+=3) {
+                colors.put(i + 0, color.x);
+                colors.put(i + 1, color.y);
+                colors.put(i + 2, color.z);
+            }
+            changed();
+        }
+        return this;
+    }
 	
 	/**
 	 * Gets the bounding sphere that surounds this object.

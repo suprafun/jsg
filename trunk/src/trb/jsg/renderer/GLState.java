@@ -48,6 +48,8 @@ import trb.jsg.LightState;
 import trb.jsg.Shader;
 import trb.jsg.Shape;
 import trb.jsg.State;
+import trb.jsg.State.StencilFuncParams;
+import trb.jsg.State.StencilOpParams;
 import trb.jsg.Uniform;
 import trb.jsg.Unit;
 import trb.jsg.enums.*;
@@ -69,7 +71,7 @@ class GLState {
 	
 	// culling state
 	public static boolean cullEnabled = false;
-	public static CullFace cullFace = CullFace.BACK;
+	public static Face cullFace = Face.BACK;
 	public static FrontFace frontFace = FrontFace.CCW;
 	public static boolean depthTestEnabled = true;
 	public static DepthFunc depthFunc = DepthFunc.LESS;
@@ -87,21 +89,13 @@ class GLState {
 	public static TextureUnitState[] glUnits;
 	
 	private static boolean stencilTestEnabled = false;
-	private static StencilFunc stencilFuncFront = StencilFunc.ALWAYS;
-	private static int stencilRefFront = 0;
-	private static int stencilMaskFront = 0xff;
-	private static int stencilWriteMaskFront = 0xff;
-	private static StencilOp stencilFailFront = StencilOp.KEEP;
-	private static StencilOp stencilDepthFailFront = StencilOp.KEEP;
-	private static StencilOp stencilDepthPassFront = StencilOp.KEEP;
-	
-	private static StencilFunc stencilFuncBack = StencilFunc.ALWAYS;
-	private static int stencilRefBack = 0;
-	private static int stencilMaskBack = 0xff;
-	private static int stencilWriteMaskBack = 0xff;
-	private static StencilOp stencilFailBack = StencilOp.KEEP;
-	private static StencilOp stencilDepthFailBack = StencilOp.KEEP;
-	private static StencilOp stencilDepthPassBack = StencilOp.KEEP;
+    private static StencilFuncParams stencilFuncFront = State.DEFAULT_STENCIL_FUNC;
+    private static StencilOpParams stencilOpFront = State.DEFAULT_STENCIL_OP;
+    private static int stencilMaskFront = 0xff;
+
+    private static StencilFuncParams stencilFuncBack = State.DEFAULT_STENCIL_FUNC;
+    private static StencilOpParams stencilOpBack = State.DEFAULT_STENCIL_OP;
+    private static int stencilMaskBack = 0xff;
 	
 	private static boolean alphaTestEnabled = false;
 	private static AlphaTestFunc alphaTestFunc = AlphaTestFunc.ALWAYS;
@@ -222,21 +216,12 @@ class GLState {
 		frontFace = state.getFrontFace();
 		
 		stencilTestEnabled = state.isStencilTestEnabled();
-		stencilFuncFront = state.getStencilFuncFront();
-		stencilRefFront = state.getStencilRefFront();
-		stencilMaskFront = state.getStencilMaskFront();
-		stencilWriteMaskFront = state.getStencilWriteMaskFront();
-		stencilFailFront = state.getStencilFailFront();
-		stencilDepthFailFront = state.getStencilDepthFailFront();
-		stencilDepthPassFront = state.getStencilDepthPassFront();
-		
-		stencilFuncBack = state.getStencilFuncBack();
-		stencilRefBack = state.getStencilRefBack();
-		stencilMaskBack = state.getStencilMaskBack();
-		stencilWriteMaskBack = state.getStencilWriteMaskBack();
-		stencilFailBack = state.getStencilFailBack();
-		stencilDepthFailBack = state.getStencilDepthFailBack();
-		stencilDepthPassBack = state.getStencilDepthPassBack();
+        stencilFuncFront = state.getStencilFuncFront();
+        stencilOpFront = state.getStencilOpFront();
+        stencilMaskFront = state.getStencilMaskFront();
+        stencilFuncBack = state.getStencilFuncBack();
+        stencilOpBack = state.getStencilOpBack();
+        stencilMaskBack = state.getStencilMaskBack();
 
 		alphaTestEnabled = state.isAlphaTestEnabled();
 		alphaTestFunc = state.getAlphaTestFunc();
@@ -347,12 +332,12 @@ class GLState {
 
 		// stencil test
 		setEnable(GL_STENCIL_TEST, stencilTestEnabled);
-		glStencilFuncSeparate(GL_FRONT, stencilFuncFront.get(), stencilRefFront, stencilMaskFront);
-		glStencilMaskSeparate(GL_FRONT, stencilWriteMaskFront);
-		glStencilOpSeparate(GL_FRONT, stencilFailFront.get(), stencilDepthFailFront.get(), stencilDepthPassFront.get());
-		glStencilFuncSeparate(GL_BACK, stencilFuncBack.get(), stencilRefBack, stencilMaskBack);
-		glStencilMaskSeparate(GL_BACK, stencilWriteMaskBack);
-		glStencilOpSeparate(GL_BACK, stencilFailBack.get(), stencilDepthFailBack.get(), stencilDepthPassBack.get());
+        stencilFuncFront.apply(Face.FRONT);
+        stencilFuncBack.apply(Face.BACK);
+        stencilOpFront.apply(Face.FRONT);
+        stencilOpBack.apply(Face.BACK);
+        glStencilMaskSeparate(GL_FRONT, stencilMaskFront);
+        glStencilMaskSeparate(GL_BACK, stencilMaskBack);
 		
 		// alpha test
 		setEnable(GL_ALPHA_TEST, alphaTestEnabled);
@@ -479,43 +464,33 @@ class GLState {
 			setEnable(GL_STENCIL_TEST, stencilTestEnabled);
 		}
 		if (stencilTestEnabled) {
-			// front
-			if (stencilFuncFront != state.getStencilFuncFront() 
-					|| stencilRefFront != state.getStencilRefFront()
-					|| stencilMaskFront != state.getStencilMaskFront()) {
-				stencilFuncFront = state.getStencilFuncFront();
-				stencilRefFront = state.getStencilRefFront();
-				stencilMaskFront = state.getStencilMaskFront();
-				glStencilFuncSeparate(GL_FRONT, stencilFuncFront.get(), stencilRefFront, stencilMaskFront);
-			}
-			if (stencilWriteMaskFront != state.getStencilWriteMaskFront()) {
-				stencilWriteMaskFront = state.getStencilWriteMaskFront();
-				glStencilMaskSeparate(GL_FRONT, stencilWriteMaskFront);
-			}
-			if (stencilFailFront != state.getStencilFailFront()
-					|| stencilDepthFailFront != state.getStencilDepthFailFront()
-					|| stencilDepthPassFront != state.getStencilDepthPassFront()) {
-				glStencilOpSeparate(GL_FRONT, stencilFailFront.get(), stencilDepthFailFront.get(), stencilDepthPassFront.get());
-			}
+            // front
+            if (!stencilFuncFront.equals(state.getStencilFuncFront())) {
+                stencilFuncFront = state.getStencilFuncFront();
+                stencilFuncFront.apply(Face.FRONT);
+            }
+            if (!stencilOpFront.equals(state.getStencilOpFront())) {
+                stencilOpFront = state.getStencilOpFront();
+                stencilOpFront.apply(Face.FRONT);
+            }
+            if (stencilMaskFront != state.getStencilMaskFront()) {
+                stencilMaskFront = state.getStencilMaskFront();
+                glStencilMaskSeparate(GL_FRONT, stencilMaskFront);
+            }
 			
 			// back
-			if (stencilFuncBack != state.getStencilFuncBack() 
-					|| stencilRefBack != state.getStencilRefBack()
-					|| stencilMaskBack != state.getStencilMaskBack()) {
-				stencilFuncBack = state.getStencilFuncBack();
-				stencilRefBack = state.getStencilRefBack();
-				stencilMaskBack = state.getStencilMaskBack();
-				glStencilFuncSeparate(GL_BACK, stencilFuncBack.get(), stencilRefBack, stencilMaskBack);
-			}
-			if (stencilWriteMaskBack != state.getStencilWriteMaskBack()) {
-				stencilWriteMaskBack = state.getStencilWriteMaskBack();
-				glStencilMaskSeparate(GL_BACK, stencilWriteMaskBack);
-			}
-			if (stencilFailBack != state.getStencilFailBack()
-					|| stencilDepthFailBack != state.getStencilDepthFailBack()
-					|| stencilDepthPassBack != state.getStencilDepthPassBack()) {
-				glStencilOpSeparate(GL_BACK, stencilFailBack.get(), stencilDepthFailBack.get(), stencilDepthPassBack.get());
-			}
+            if (!stencilFuncBack.equals(state.getStencilFuncBack())) {
+                stencilFuncBack = state.getStencilFuncBack();
+                stencilFuncBack.apply(Face.BACK);
+            }
+            if (!stencilOpBack.equals(state.getStencilOpBack())) {
+                stencilOpBack = state.getStencilOpBack();
+                stencilOpBack.apply(Face.BACK);
+            }
+            if (stencilMaskBack != state.getStencilMaskBack()) {
+                stencilMaskBack = state.getStencilMaskBack();
+                glStencilMaskSeparate(GL_BACK, stencilMaskBack);
+            }
 		}
 		
 		// alpha test
@@ -807,21 +782,24 @@ class GLState {
 		checkInt(GL_BLEND_DST, blendDstFunc.get(), "GL_BLEND_DST");
 		checkInt(GL_ACTIVE_TEXTURE, activeTexture, "GL_ACTIVE_TEXTURE");
 		checkEnabled(GL_STENCIL_TEST, stencilTestEnabled, "GL_STENCIL_TEST");
-		checkInt(GL_STENCIL_FUNC, stencilFuncFront.get(), "GL_STENCIL_FUNC");
-		checkInt(GL_STENCIL_REF, stencilRefFront, "GL_STENCIL_REF");
-		checkInt(GL_STENCIL_VALUE_MASK, stencilMaskFront, "GL_STENCIL_VALUE_MASK");
-		checkInt(GL_STENCIL_WRITEMASK, stencilWriteMaskFront, "GL_STENCIL_WRITEMASK");
-		checkInt(GL_STENCIL_FAIL, stencilFailFront.get(), "GL_STENCIL_FAIL");
-		checkInt(GL_STENCIL_PASS_DEPTH_FAIL, stencilDepthFailFront.get(), "GL_STENCIL_PASS_DEPTH_FAIL");
-		checkInt(GL_STENCIL_PASS_DEPTH_PASS, stencilDepthPassFront.get(), "GL_STENCIL_PASS_DEPTH_PASS");
-		checkInt(GL_STENCIL_BACK_FUNC, stencilFuncBack.get(), "GL_STENCIL_BACK_FUNC");
-		checkInt(GL_STENCIL_BACK_REF, stencilRefBack, "GL_STENCIL_BACK_REF");
-		checkInt(GL_STENCIL_BACK_VALUE_MASK, stencilMaskBack, "GL_STENCIL_BACK_VALUE_MASK");
-		checkInt(GL_STENCIL_BACK_WRITEMASK, stencilWriteMaskBack, "GL_STENCIL_BACK_WRITEMASK");
-		checkInt(GL_STENCIL_BACK_FAIL, stencilFailBack.get(), "GL_STENCIL_BACK_FAIL");
-		checkInt(GL_STENCIL_BACK_PASS_DEPTH_FAIL, stencilDepthFailBack.get(), "GL_STENCIL_BACK_PASS_DEPTH_FAIL");
-		checkInt(GL_STENCIL_BACK_PASS_DEPTH_PASS, stencilDepthPassBack.get(), "GL_STENCIL_BACK_PASS_DEPTH_PASS");
-		checkEnabled(GL_ALPHA_TEST, alphaTestEnabled, "GL_ALPHA_TEST");
+
+        checkInt(GL_STENCIL_FUNC, stencilFuncFront.func.get(), "GL_STENCIL_FUNC");
+		checkInt(GL_STENCIL_REF, stencilFuncFront.ref, "GL_STENCIL_REF");
+		checkInt(GL_STENCIL_VALUE_MASK, stencilFuncFront.mask, "GL_STENCIL_VALUE_MASK");
+		checkInt(GL_STENCIL_WRITEMASK, stencilMaskFront, "GL_STENCIL_WRITEMASK");
+		checkInt(GL_STENCIL_FAIL, stencilOpFront.sfail.get(), "GL_STENCIL_FAIL");
+		checkInt(GL_STENCIL_PASS_DEPTH_FAIL, stencilOpFront.dpfail.get(), "GL_STENCIL_PASS_DEPTH_FAIL");
+		checkInt(GL_STENCIL_PASS_DEPTH_PASS, stencilOpFront.dppass.get(), "GL_STENCIL_PASS_DEPTH_PASS");
+
+        checkInt(GL_STENCIL_BACK_FUNC, stencilFuncBack.func.get(), "GL_STENCIL_BACK_FUNC");
+        checkInt(GL_STENCIL_BACK_REF, stencilFuncBack.ref, "GL_STENCIL_BACK_REF");
+        checkInt(GL_STENCIL_BACK_VALUE_MASK, stencilFuncBack.mask, "GL_STENCIL_BACK_VALUE_MASK");
+        checkInt(GL_STENCIL_BACK_WRITEMASK, stencilMaskBack, "GL_STENCIL_BACK_WRITEMASK");
+        checkInt(GL_STENCIL_BACK_FAIL, stencilOpBack.sfail.get(), "GL_STENCIL_BACK_FAIL");
+        checkInt(GL_STENCIL_BACK_PASS_DEPTH_FAIL, stencilOpBack.dpfail.get(), "GL_STENCIL_BACK_PASS_DEPTH_FAIL");
+        checkInt(GL_STENCIL_BACK_PASS_DEPTH_PASS, stencilOpBack.dppass.get(), "GL_STENCIL_BACK_PASS_DEPTH_PASS");
+
+        checkEnabled(GL_ALPHA_TEST, alphaTestEnabled, "GL_ALPHA_TEST");
 		checkInt(GL_ALPHA_TEST_FUNC, alphaTestFunc.get(), "GL_ALPHA_TEST_FUNC");
 		checkFloat(GL_ALPHA_TEST_REF, alphaTestRef, "GL_ALPHA_TEST_REF");
 		checkEnabled(GL_POLYGON_OFFSET_FILL, polygonOffsetFillEnabled, "GL_POLYGON_OFFSET_FILL");

@@ -32,7 +32,7 @@
 
 package trb.jsg.renderer;
 
-import static org.lwjgl.opengl.EXTFramebufferObject.*;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL11.*;
 
 import java.nio.IntBuffer;
@@ -61,7 +61,7 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 		this.renderTarget = renderTarget;
 		drawBuffers = BufferUtils.createIntBuffer(Math.min(RetainedSceneGraph.maxDrawBuffers, renderTarget.getColorAttachments().length));
 		for (int i=0; i<drawBuffers.limit(); i++) {
-			int id = renderTarget.getColorAttachments()[i] == null ? GL_NONE : (GL_COLOR_ATTACHMENT0_EXT + i);
+			int id = renderTarget.getColorAttachments()[i] == null ? GL_NONE : (GL_COLOR_ATTACHMENT0 + i);
 			drawBuffers.put(i, id);
 		}
 	}
@@ -78,14 +78,14 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
             if (retainedDepthBuffer.parents.isEmpty()) {
                 IntBuffer id = retainedDepthBuffer.depthBufferId;
                 id.rewind();
-                glDeleteRenderbuffersEXT(id);
+                glDeleteRenderbuffers(id);
                 depthBuffer.nativePeer = null;
                 System.out.println(this + " destroy depth buffer id=" + id.get(0));
             }
         }
 		if (fboId.get(0) > 0) {
 			fboId.rewind();
-			glDeleteFramebuffersEXT(fboId);
+			glDeleteFramebuffers(fboId);
 			System.out.println(this + " destroy fbo buffer id="+fboId.get(0));
 		}
 		for (Texture colorAttachment : renderTarget.getColorAttachments()) {
@@ -102,8 +102,8 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 	public void updateNativeResource() {
 		System.err.println(this+".updateNativeResource()");
 		if (fboId.get(0) <= 0) {
-			glGenFramebuffersEXT(fboId);
-			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId.get(0));
+			glGenFramebuffers(fboId);
+			glBindFramebuffer(GL_FRAMEBUFFER, fboId.get(0));
 
             DepthBuffer depthBuffer = renderTarget.getDepthBuffer();
             if (depthBuffer != null) {
@@ -116,13 +116,17 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
                     IntBuffer id = retainedDepthBuffer.depthBufferId;
                     if (id.get(0) <= 0) {
                         id.rewind();
-                        glGenRenderbuffersEXT(id);
-                        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, id.get(0));
-                        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, renderTarget.getWidth(), renderTarget.getHeight());
+                        glGenRenderbuffers(id);
+                        glBindRenderbuffer(GL_RENDERBUFFER, id.get(0));
+                        glRenderbufferStorage(GL_RENDERBUFFER, depthBuffer.format, renderTarget.getWidth(), renderTarget.getHeight());
                     } else {
-                        glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, id.get(0));
+                        glBindRenderbuffer(GL_RENDERBUFFER, id.get(0));
                     }
-                    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, id.get(0));
+                    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, id.get(0));
+                    if (depthBuffer.format == GL_DEPTH24_STENCIL8 || depthBuffer.format == GL_DEPTH32F_STENCIL8) {
+                        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, id.get(0));
+                        System.out.println("attach stencil buffer");
+                    }
                 }
             }
 
@@ -147,23 +151,23 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 					if (renderTarget.isGenerateMipMap()) {
 						GLState.glActiveTextureWrapper(GL13.GL_TEXTURE0);
 						GLState.glBindTextureWrapper(GL_TEXTURE_2D, peer.getTextureId());
-						glGenerateMipmapEXT(GL_TEXTURE_2D);
+						glGenerateMipmap(GL_TEXTURE_2D);
 					}
 					
-					glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, peer.getTextureId(), 0);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, peer.getTextureId(), 0);
 				}
 			}
-            int frameBufferState = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-			if (GL_FRAMEBUFFER_COMPLETE_EXT != frameBufferState) {
+            int frameBufferState = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+			if (GL_FRAMEBUFFER_COMPLETE != frameBufferState) {
                 String description = "";
-                if (GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT == frameBufferState) {
-                    description = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT";
-                } else if (GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT == frameBufferState) {
-                    description = "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT";
-                } else if (GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT == frameBufferState) {
-                    description = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT";
-                } else if (GL_FRAMEBUFFER_UNSUPPORTED_EXT == frameBufferState) {
-                    description = "GL_FRAMEBUFFER_UNSUPPORTED_EXT";
+                if (GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT == frameBufferState) {
+                    description = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+                } else if (GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT == frameBufferState) {
+                    description = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+                } else if (GL_FRAMEBUFFER_UNSUPPORTED == frameBufferState) {
+                    description = "GL_FRAMEBUFFER_UNSUPPORTED";
+                } else {
+                    description = "Unknown";
                 }
 				throw new RuntimeException("Framebuffer not complete. " + description);
 			}

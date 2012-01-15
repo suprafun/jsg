@@ -32,16 +32,27 @@
 package trb.jsg;
 
 import java.io.Serializable;
+import org.lwjgl.opengl.GL11;
 import trb.jsg.peers.DepthBufferPeer;
 
 /**
  * The depth buffer of a RenderTarget. The size of the depth buffer is taken
- * from one RenderTargets that uses it. All the RenderTargets that use the same
- * DepthBuffer must be of the same size.
+ * from one of the RenderTargets that uses it. All the RenderTargets that use
+ * the same DepthBuffer must be of the same size.
  */
 public class DepthBuffer implements Serializable {
     
     private static final long serialVersionUID = 0L;
 
     transient public DepthBufferPeer nativePeer;
+
+    public final int format;
+
+    public DepthBuffer() {
+        this(GL11.GL_DEPTH_COMPONENT);
+    }
+
+    public DepthBuffer(int format) {
+        this.format = format;
+    }
 }
