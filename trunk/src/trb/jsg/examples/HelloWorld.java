@@ -32,71 +32,32 @@
 
 package trb.jsg.examples;
 
-import javax.vecmath.Color4f;
+import org.lwjgl.opengl.*;
 
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
-
-import trb.jsg.RenderPass;
-import trb.jsg.SceneGraph;
-import trb.jsg.Shape;
-import trb.jsg.VertexData;
-import trb.jsg.View;
+import trb.jsg.*;
 import trb.jsg.renderer.Renderer;
+import trb.jsg.util.geometry.VertexDataUtils;
 
 /**
  * Renders a single triangle in ortho mode.
- * 
- * @author tombr
- *
  */
 public class HelloWorld {
 	
 	public static void main(String[] args) throws Exception {
-		// Use LWJGL to create a frame
-		int windowWidth = 640;
-		int windowHeight = 480;
-		Display.setDisplayMode(new DisplayMode(windowWidth, windowHeight));
-		Display.create();
+        Display.setDisplayMode(new DisplayMode(640, 480));
+        Display.create();
 
-		// create a renderpass that renders to the screen
-		RenderPass renderPass = new RenderPass();
-		renderPass.setClearMask(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-		renderPass.setClearColor(new Color4f(0, 0, 0.4f, 0));
-        
-        // ortho mode with a 1:1 mapping to the screen
-		renderPass.setView(View.createOrtho(0, windowWidth, 0, windowHeight, -1000, 1000));
+        RenderPass renderPass = new RenderPass();
+        renderPass.setClearMask(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+        renderPass.setView(View.createOrtho(0, 640, 0, 480, -1000, 1000));
+        renderPass.getRootNode().addShape(new Shape(VertexDataUtils.createQuad(100, 100, 300, 300, 0)));
+        Renderer renderer = new Renderer(new SceneGraph(renderPass));
 
-		// shape has vertex data, state and matrix
-		Shape shape = new Shape(new VertexData(
-			  new float[] {100, 100, 0,   100, 400, 0,  400, 400, 0} // coordinates
-			, null // normals
-            , null // colors
-            , 2 // texture element size
-            , null // texture coordinates
-			, new int[] {0, 1, 2} // indices
-		));
-		
-		// add shape to the renderpass tree
-		renderPass.getRootNode().addShape(shape);
+        while (!Display.isCloseRequested()) {
+            renderer.render();
+            Display.update();
+        }
 
-		// create scene graph that uses render pass
-		SceneGraph sceneGraph = new SceneGraph(renderPass);
-
-		// create a renderer that renders the scenegraph
-		Renderer renderer = new Renderer(sceneGraph);
-
-		// main game loop
-		while (!Display.isCloseRequested()) {
-			// render the scene graph
-			renderer.render();
-			
-			// flip backbuffer
-			Display.update();
-		}
-
-		// destroy frame when we're done
-		Display.destroy();
+        Display.destroy();
 	}
 }
