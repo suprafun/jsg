@@ -34,7 +34,6 @@ package trb.jsg;
 
 import java.io.Serializable;
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -45,7 +44,6 @@ import org.lwjgl.BufferUtils;
 //import org.lwjgl.util.vector.Matrix2f;
 import trb.jsg.util.Mat4;
 
-import trb.jsg.util.SGUtil;
 
 /**
  * Uniform shader value that holds one or more elements of a specified type of 
@@ -67,13 +65,10 @@ public class Uniform implements Serializable {
 		, MAT3, MAT4, MAT2x3, MAT3x2, MAT2x4, MAT4x2, MAT3x4, MAT4x3}
 	
 	/** The name of the uniform */
-	private String name;
-
-	/** The name as a 0 terminated string in a ByteBuffer */
-	private ByteBuffer nameBuffer;
+	private final String name;
 	
 	/** This uniforms type */
-	private Type type = Type.FLOAT;
+	private final Type type;// = Type.FLOAT;
 
 	/** The data. FloatBuffer if type is FLOAT or MATRIX, otherwise IntBuffer */
 	private Buffer data;
@@ -89,7 +84,6 @@ public class Uniform implements Serializable {
 	 */
 	public Uniform(String name, Type type, float... floats) {
 		this.name = name;
-		this.nameBuffer = SGUtil.nameToByteBuffer(name);
 		this.type = type;
 		FloatBuffer floatData = BufferUtils.createFloatBuffer(floats.length);
 		floatData.put(floats).rewind();
@@ -104,7 +98,6 @@ public class Uniform implements Serializable {
 	 */
 	public Uniform(String name, Type type, boolean transpose, float... floats) {
 		this.name = name;
-		this.nameBuffer = SGUtil.nameToByteBuffer(name);
 		this.type = type;
 		this.transpose = transpose;
 		FloatBuffer floatData = BufferUtils.createFloatBuffer(floats.length);
@@ -119,7 +112,7 @@ public class Uniform implements Serializable {
 	 * @param ints the data
 	 */
 	public Uniform(String name, Type type, int... ints) {
-		this.nameBuffer = SGUtil.nameToByteBuffer(name);
+        this.name = name;
 		this.type = type;
 		IntBuffer intData = BufferUtils.createIntBuffer(ints.length);
 		intData.put(ints).rewind();
@@ -155,7 +148,6 @@ public class Uniform implements Serializable {
 	 */
 	public Uniform(String name, boolean transpose, Matrix3f... matrix) {
 		this.name = name;
-		this.nameBuffer = SGUtil.nameToByteBuffer(name);
 		this.type = Type.MAT3;
 		this.transpose = transpose;
 		FloatBuffer floatData = BufferUtils.createFloatBuffer(matrix.length*9);
@@ -177,7 +169,6 @@ public class Uniform implements Serializable {
 	 */
 	public Uniform(String name, boolean transpose, Mat4... matrix) {
 		this.name = name;
-		this.nameBuffer = SGUtil.nameToByteBuffer(name);
 		this.type = Type.MAT4;
 		this.transpose = transpose;
 		FloatBuffer floatData = BufferUtils.createFloatBuffer(matrix.length*16);
@@ -192,14 +183,6 @@ public class Uniform implements Serializable {
 	 */
 	public String getName() {
 		return name;
-	}
-
-	/**
-	 * Gets name as a 0 terminated ByteBuffer that can be sent to OpengGL.
-	 * @return the name
-	 */
-	public ByteBuffer getNameBuffer() {
-		return nameBuffer;
 	}
 
 	/**
