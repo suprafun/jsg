@@ -39,6 +39,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Point3f;
 
@@ -70,8 +71,8 @@ public class VertexData implements Serializable {
 	public FloatBuffer normals;
 	/** Packed red, green, blue */
 	public FloatBuffer colors;
-	public ObjectArray<TexCoordData> texCoords = new ObjectArray<TexCoordData>();
-	public ObjectArray<AttributeData> attributes = new ObjectArray<AttributeData>();
+	public final ObjectArray<TexCoordData> texCoords = new ObjectArray<TexCoordData>();
+	public final ObjectArray<AttributeData> attributes = new ObjectArray<AttributeData>();
 	public IntBuffer indices;
 	
 //	transient private BoundingBox boundingBox;
@@ -201,6 +202,14 @@ public class VertexData implements Serializable {
 			boundingSphere.combine(currentP3d);
 		}
 	}
+
+    public Vec3 getCoordinate(int index, Vec3 out) {
+        if (out == null) {
+            out = new Vec3();
+        }
+        out.set(coordinates.get(index * 3), coordinates.get(index * 3 + 1), coordinates.get(index * 3 + 2));
+        return out;
+    }
 	
 	/**
 	 * Serializable.
@@ -302,7 +311,7 @@ public class VertexData implements Serializable {
 			indices = BufferUtils.createIntBuffer(array.length);
 			indices.put(array).rewind();
 		}
-		texCoords = new ObjectArray<TexCoordData>();
+		texCoords.clear();
 		int texCoordCnt = in.readInt();
 		for (int i=0; i<texCoordCnt; i++) {
 			boolean hasData = in.readBoolean();
@@ -315,7 +324,7 @@ public class VertexData implements Serializable {
 				texCoords.set(texData, i);
 			}
 		}		
-		attributes = new ObjectArray<AttributeData>();
+		attributes.clear();
 		int attributeCnt = in.readInt();
 		for (int i=0; i<attributeCnt; i++) {
 			boolean hasData = in.readBoolean();
@@ -349,6 +358,16 @@ public class VertexData implements Serializable {
 		 * Must be 1, 2, 3, or 4. The initial value is 4. 
 		 */
 		public int size = 4;
+
+        public AttributeData() {
+            
+        }
+
+        public AttributeData(float[] floats, int size) {
+            data = BufferUtils.createFloatBuffer(floats.length);
+            data.put(floats).rewind();
+            this.size = size;
+        }
 		
 		// commented out since we only support float
 //		/** Specifies the data type of each component in the array. Symbolic
@@ -381,6 +400,6 @@ public class VertexData implements Serializable {
 		/** Specifies the number of coordinates per array element. Must be 1, 
 		 * 2, 3, or 4. The initial value is 4.
 		 */
-		public int size;
+		public int size = 4;
 	}
 }
