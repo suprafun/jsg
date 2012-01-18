@@ -229,7 +229,7 @@ class RetainedShader implements ShaderPeer, NativeResource {
 	 */
 	protected void setUniform(Uniform uniform) {
 		Util.checkGLError(); 
-		int loc = GL20.glGetUniformLocation(programId, uniform.getNameBuffer());
+		int loc = GL20.glGetUniformLocation(programId, uniform.getName());
 //		System.out.println("setUniform "+uniform.getName()+" "+loc);
 		if (loc == -1) {
 			System.err.println(getClass().getSimpleName()+" shader do not contain uniform named: "+uniform.getName());
