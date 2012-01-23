@@ -216,11 +216,9 @@ class RetainedTexture implements TexturePeer, NativeResource {
 			glTexParameteri(target, GL_TEXTURE_MAG_FILTER, texture.getMagFilter().get());
 			glTexParameteri(target, GL_TEXTURE_MIN_FILTER, texture.getMinFilter().get());
 			glTexParameterf(target, GL_TEXTURE_MAX_ANISOTROPY_EXT, texture.getMaxAnisotropy());
-			if (target != GL_TEXTURE_CUBE_MAP) {
-				glTexParameteri(target, GL_TEXTURE_WRAP_S, texture.getWrapS().get());
-				glTexParameteri(target, GL_TEXTURE_WRAP_T, texture.getWrapT().get());
-				glTexParameteri(target, GL_TEXTURE_WRAP_R, texture.getWrapT().get());
-			}
+            glTexParameteri(target, GL_TEXTURE_WRAP_S, texture.getWrapS().get());
+            glTexParameteri(target, GL_TEXTURE_WRAP_T, texture.getWrapT().get());
+            glTexParameteri(target, GL_TEXTURE_WRAP_R, texture.getWrapT().get());
 		}
 	}
 
