@@ -177,6 +177,15 @@ public class Texture implements Serializable {
 	
 	/**
 	 * Sets the texture data.
+     *
+     * The order of the sides in the cubemap are:
+     * GL_TEXTURE_CUBE_MAP_POSITIVE_X
+     * GL_TEXTURE_CUBE_MAP_NEGATIVE_X
+     * GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+     * GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+     * GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+     * GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+     * 
 	 * @param width the width of the texture
 	 * @param height the height of the texture
 	 * @param format the format of the data
