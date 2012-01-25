@@ -34,9 +34,9 @@ package trb.jsg;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import javax.vecmath.Matrix4f;
 import trb.jsg.util.Mat4;
 
 
@@ -79,6 +79,14 @@ public class TreeNode implements Serializable {
 	 */
 	public TreeNode() {
 	}
+
+    /**
+     * Constructs a node with no children and the specified shapes and an
+     * identity matrix.
+     */
+    public TreeNode(Shape... shapes) {
+        this.shapes.addAll(Arrays.asList(shapes));
+    }
 	
 	/**
 	 * Sets the nodes transform matrix by copy.
