@@ -222,6 +222,17 @@ public class TreeNode implements Serializable {
         }
         flagAsDirty();
 	}
+
+    public void removeAllShapes() {
+        RootNode root = getRoot();
+        if (root != null) {
+            for (Shape shape : shapes) {
+                root.renderPass.removeShape(shape);
+            }
+        }
+        shapes.clear();
+        flagAsDirty();
+    }
 	
 	/**
 	 * Gets the number of shapes.

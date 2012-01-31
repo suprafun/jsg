@@ -229,7 +229,7 @@ class RetainedShape implements ShapePeer {
 	 * @param newTexture the new texture
 	 */
 	public void textureChanged(Texture oldTexture, Texture newTexture) {
-		System.out.println("textureChanged "+oldTexture+" "+newTexture);
+		//System.out.println("textureChanged "+oldTexture+" "+newTexture);
 		RetainedSceneGraph renderer = ((RetainedRenderPass)shape.parent.nativePeer).sceneGraphPeer;
 		if (oldTexture != null && oldTexture.nativePeer != null) {
 			RetainedTexture simpleTexturePeer = (RetainedTexture) oldTexture.nativePeer;
@@ -346,10 +346,11 @@ class RetainedShape implements ShapePeer {
 		if (shape.getState().getShader() != null) {
 			GLState.applyUniforms(shape);
 		}
-		
+
+        RetainedVertexData vertexData = (RetainedVertexData) shape.getVertexData().nativePeer;
 		switch (renderType) {
 		case IMMEDIATE:
-			((RetainedVertexData) shape.getVertexData().nativePeer).drawImmediate(null);
+			vertexData.drawImmediate(null);
 			if (worldDisplayListId > 0) {
 				worldBBox = null;
 				GL11.glDeleteLists(worldDisplayListId, 1);
@@ -357,7 +358,7 @@ class RetainedShape implements ShapePeer {
 			}
 			break;
 		case VERTEX_ARRAY:
-			GLState.clientState = ((RetainedVertexData) shape.getVertexData().nativePeer).drawVertexArray(GLState.clientState);
+			GLState.clientState = vertexData.drawVertexArray(GLState.clientState);
 			if (worldDisplayListId > 0) {
 				worldBBox = null;
 				GL11.glDeleteLists(worldDisplayListId, 1);
@@ -365,7 +366,7 @@ class RetainedShape implements ShapePeer {
 			}
 			break;
 		case DISPLAY_LIST:
-			((RetainedVertexData) shape.getVertexData().nativePeer).drawList();
+			vertexData.drawList();
 			if (worldDisplayListId > 0) {
 				worldBBox = null;
 				GL11.glDeleteLists(worldDisplayListId, 1);
@@ -376,9 +377,8 @@ class RetainedShape implements ShapePeer {
 			if (worldDisplayListId <= 0) {
 				worldDisplayListId = GL11.glGenLists(1);
 				GL11.glNewList(worldDisplayListId, GL11.GL_COMPILE);
-				RetainedVertexData vertexDataPeer = ((RetainedVertexData) shape.getVertexData().nativePeer); 
-				vertexDataPeer.drawImmediate(shape.getModelMatrix());
-				worldBBox = vertexDataPeer.calculateBoundingBox(shape.getModelMatrix()); 
+				vertexData.drawImmediate(shape.getModelMatrix());
+				worldBBox = vertexData.calculateBoundingBox(shape.getModelMatrix()); 
 				GL11.glEndList();
 			}
 			// TODO: we can no longer batch lists because shader uniforms can change between shapes

@@ -35,6 +35,11 @@ package trb.jsg.util;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.BufferUtils;
+import trb.jsg.Texture;
+import trb.jsg.enums.Format;
+import trb.jsg.enums.MagFilter;
+import trb.jsg.enums.MinFilter;
+import trb.jsg.enums.TextureType;
 
 public class SGUtil {
 	
@@ -66,4 +71,12 @@ public class SGUtil {
 		
 		return pow2Size;
 	}
+
+    public static Texture createTexture(int internalFormat, int w, int h) {
+        ByteBuffer[][] pixels = {{BufferUtils.createByteBuffer(w * h * 4)}};
+        Texture baseTexture = new Texture(TextureType.TEXTURE_2D, internalFormat, w, h, 0, Format.RGBA, pixels, false, false);
+        baseTexture.setMagFilter(MagFilter.NEAREST);
+        baseTexture.setMinFilter(MinFilter.NEAREST);
+        return baseTexture;
+    }
 }

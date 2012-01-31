@@ -65,7 +65,7 @@ public class DirtyRectangles {
 
         ByteBuffer byteBuffer = BufferUtils.createByteBuffer(256 * 256 * 4);
         ByteBuffer[][] pixels = {{byteBuffer}};
-        Texture texture = new Texture(TextureType.TEXTURE_2D, 4, 256, 256, 0, Format.BGRA, pixels, false);
+        Texture texture = new Texture(TextureType.TEXTURE_2D, 4, 256, 256, 0, Format.BGRA, pixels, false, false);
 
         Shape shape = new Shape(VertexDataUtils.createQuad(0, 0, 640, 480, 0));
         shape.getState().setUnit(0, new Unit(texture));

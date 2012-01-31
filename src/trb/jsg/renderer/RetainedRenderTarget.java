@@ -59,6 +59,10 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 	
 	public RetainedRenderTarget(RenderTarget renderTarget) {
 		this.renderTarget = renderTarget;
+        if (renderTarget.getColorAttachments().length > RetainedSceneGraph.maxDrawBuffers) {
+            System.err.println(renderTarget.getColorAttachments().length
+                    + " is more color attachments than are supported: " + RetainedSceneGraph.maxDrawBuffers);
+        }
 		drawBuffers = BufferUtils.createIntBuffer(Math.min(RetainedSceneGraph.maxDrawBuffers, renderTarget.getColorAttachments().length));
 		for (int i=0; i<drawBuffers.limit(); i++) {
 			int id = renderTarget.getColorAttachments()[i] == null ? GL_NONE : (GL_COLOR_ATTACHMENT0 + i);
@@ -70,7 +74,7 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 	 * Implements NativeResource
 	 */
 	public void destroyNativeResource() {
-		System.out.println(getClass().getSimpleName()+".destroyNativeResource()");
+		//System.out.println(getClass().getSimpleName()+".destroyNativeResource()");
         DepthBuffer depthBuffer = renderTarget.getDepthBuffer();
         if (depthBuffer != null && depthBuffer.nativePeer instanceof RetainedDepthBuffer) {
             RetainedDepthBuffer retainedDepthBuffer = (RetainedDepthBuffer) depthBuffer.nativePeer;
@@ -80,13 +84,13 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
                 id.rewind();
                 glDeleteRenderbuffers(id);
                 depthBuffer.nativePeer = null;
-                System.out.println(this + " destroy depth buffer id=" + id.get(0));
+                //System.out.println(this + " destroy depth buffer id=" + id.get(0));
             }
         }
 		if (fboId.get(0) > 0) {
 			fboId.rewind();
 			glDeleteFramebuffers(fboId);
-			System.out.println(this + " destroy fbo buffer id="+fboId.get(0));
+			//System.out.println(this + " destroy fbo buffer id="+fboId.get(0));
 		}
 		for (Texture colorAttachment : renderTarget.getColorAttachments()) {
 			if (colorAttachment.nativePeer != null) {
@@ -100,7 +104,7 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 	 * Implements NativeResource
 	 */
 	public void updateNativeResource() {
-		System.err.println(this+".updateNativeResource()");
+		//System.err.println(this+".updateNativeResource()");
 		if (fboId.get(0) <= 0) {
 			glGenFramebuffers(fboId);
 			glBindFramebuffer(GL_FRAMEBUFFER, fboId.get(0));
@@ -125,26 +129,27 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
                     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, id.get(0));
                     if (depthBuffer.format == GL_DEPTH24_STENCIL8 || depthBuffer.format == GL_DEPTH32F_STENCIL8) {
                         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, id.get(0));
-                        System.out.println("attach stencil buffer");
                     }
                 }
             }
 
-			for (Texture colorAttachment : renderTarget.getColorAttachments()) {
+            Texture[] textures = renderTarget.getColorAttachments();
+            for (int i=0; i<textures.length; i++) {
+                Texture colorAttachment = textures[i];
 				if (colorAttachment != null) {
 					// add a texture
 					RetainedTexture peer = (RetainedTexture) colorAttachment.nativePeer;
 					if (peer == null) {
-						System.out.println("texture netivePeer is null");
+						//System.out.println("texture netivePeer is null");
 						// first time texture is added
 						peer = new RetainedTexture(colorAttachment);
 						peer.updateNativeResource();
 						colorAttachment.nativePeer = peer;
 					} else {
-						System.out.println("texture netivePeer texture id is "+peer.getTextureId());
+						//System.out.println("texture netivePeer texture id is "+peer.getTextureId());
 						if (peer.getTextureId() <= 0) {
 							peer.updateNativeResource();
-							System.out.println("After updateNativeResource() texture netivePeer texture id is "+peer.getTextureId());
+							//System.out.println("After updateNativeResource() texture netivePeer texture id is "+peer.getTextureId());
 						}
 					}
 					peer.parents.add(renderTarget);
@@ -154,7 +159,8 @@ class RetainedRenderTarget implements RenderTargetPeer, NativeResource {
 						glGenerateMipmap(GL_TEXTURE_2D);
 					}
 					
-					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, peer.getTextureId(), 0);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i
+                            , colorAttachment.getType().get(), peer.getTextureId(), 0);
 				}
 			}
             int frameBufferState = glCheckFramebufferStatus(GL_FRAMEBUFFER);

@@ -58,7 +58,7 @@ public class View implements Serializable {
     private float far = 0;
 	
 	// defines the viewing volume
-	private Mat4 projectionMatrix;
+	private Mat4 projectionMatrix = new Mat4();
 	
 	// the location of the view
 	private Mat4 cameraMatrix = new Mat4();
@@ -85,6 +85,18 @@ public class View implements Serializable {
 			worldPlanes[i] = new Plane();
 		}
 	}
+
+    public View(View view) {
+        projectionMatrix.set(view.projectionMatrix);
+        cameraMatrix.set(view.cameraMatrix);
+        cameraMatrixInverted.set(view.cameraMatrixInverted);
+        near = view.near;
+        far = view.far;
+        for (int i=0; i<6; i++) {
+            planes[i] = new Plane(view.planes[i].P, view.planes[i].N);
+            worldPlanes[i] = new Plane(view.worldPlanes[i].P, view.worldPlanes[i].N);
+        }
+    }
 
 	/**
 	 * Sets the view frustum to perspective projection.
