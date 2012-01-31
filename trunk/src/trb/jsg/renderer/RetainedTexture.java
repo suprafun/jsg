@@ -108,7 +108,7 @@ class RetainedTexture implements TexturePeer, NativeResource {
 			if (textureId.get(0) <= 0) {
 				textureId.rewind();
 				glGenTextures(textureId);
-				System.out.println(this+" SimpleTexturePeer create opengl texture id="+textureId.get(0));
+				//System.out.println(this+" SimpleTexturePeer create opengl texture id="+textureId.get(0));
 			}
 			int id = textureId.get(0);
 			int target = texture.getType().get();
@@ -207,7 +207,7 @@ class RetainedTexture implements TexturePeer, NativeResource {
 			if (textureId.get(0) <= 0) {
 				textureId.rewind();
 				glGenTextures(textureId);
-				System.out.println(this+" SimpleTexturePeer create opengl texture id="+textureId.get(0));
+				//System.out.println(this+" SimpleTexturePeer create opengl texture id="+textureId.get(0));
 			}
 			int target = texture.getType().get();
 			int id = textureId.get(0);
@@ -223,6 +223,10 @@ class RetainedTexture implements TexturePeer, NativeResource {
 	}
 
     private void create2D(int w, int h) {
+        if (texture.isCompressed()) {
+            // TODO: use glCompressedTexImage2D
+        }
+
         for (int levelIdx = 0; levelIdx < texture.getLevelCount(0); levelIdx++) {
             ByteBuffer pixels = texture.getPixels(0, levelIdx);
             pixels.rewind();

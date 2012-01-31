@@ -145,6 +145,9 @@ public class Texture implements Serializable {
 	
 	/** True to automaticly generate mipmaps */
 	private boolean generateMipMaps = false;
+
+    /** True if the data uses a compressed format. */
+    private boolean isCompressed = false;
 	
 	private Wrap wrapS = Wrap.REPEAT;
 	private Wrap wrapT = Wrap.REPEAT;
@@ -164,7 +167,8 @@ public class Texture implements Serializable {
     }
 
     public Texture(TextureType type, int internalFormat, int width, int height
-            , int depth, Format format, ByteBuffer[][] pixels, boolean generateMipMaps) {
+            , int depth, Format format, ByteBuffer[][] pixels
+            , boolean generateMipMaps, boolean isCompressed) {
         this.type = type;
         this.width = width;
         this.height = height;
@@ -173,6 +177,7 @@ public class Texture implements Serializable {
         this.format = format;
         this.pixels = pixels;
         this.generateMipMaps = generateMipMaps;
+        this.isCompressed = isCompressed;
     }
 	
 	/**
@@ -194,7 +199,7 @@ public class Texture implements Serializable {
 	 */
 	public void setTextureData(TextureType type, int internalFormat, int width
 			, int height, int depth, Format format, ByteBuffer[][] pixels
-			, boolean generateMipMaps) {
+			, boolean generateMipMaps, boolean isCompressed) {
 		this.type = type;
 		this.width = width;
 		this.height = height;
@@ -203,6 +208,7 @@ public class Texture implements Serializable {
 		this.format = format;
 		this.pixels = pixels;
 		this.generateMipMaps = generateMipMaps;
+        this.isCompressed = isCompressed;
 		if (nativePeer != null) {
 			nativePeer.textureDataChanged(this, null);
 		}
@@ -303,6 +309,13 @@ public class Texture implements Serializable {
 	public boolean getGenerateMipMaps() {
 		return generateMipMaps;
 	}
+
+    /**
+     * Checks if data uses a compressed format.
+     */
+    public boolean isCompressed() {
+        return isCompressed;
+    }
 
 	/**
 	 * Sets the minify filter.

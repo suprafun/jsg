@@ -401,5 +401,14 @@ public class VertexData implements Serializable {
 		 * 2, 3, or 4. The initial value is 4.
 		 */
 		public int size = 4;
+
+        public TexCoordData() {
+
+        }
+
+        public TexCoordData(FloatBuffer data, int size) {
+            this.data = data;
+            this.size = size;
+        }
 	}
 }
