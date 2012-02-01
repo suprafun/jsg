@@ -101,7 +101,7 @@ public class NormalMap {
         renderPass.setView(view);
 
         int size = 256;
-        Texture texture = createNormalMapTexture(createNormalMap(size));
+        Texture texture = createNormalMapTexture(createNormalMap(size), null);
 
         VertexData vertexData = VertexDataUtils.createQuad(-1, -1, 2, 2, 0);
         Shader shader = new Shader(new ShaderProgram(vertexShader, fragmentShader, "tangentIn"));
@@ -124,15 +124,18 @@ public class NormalMap {
         Display.destroy();
     }
 
-    public static Texture createNormalMapTexture(BufferedImage normalMap) {
+    public static Texture createNormalMapTexture(BufferedImage normalMap, BufferedImage specularMap) {
         int w = normalMap.getWidth();
         int h = normalMap.getHeight();
         ByteBuffer byteBuffer = BufferUtils.createByteBuffer(w * h * 4);
         // TODO: pass in specular map as image.
         int[] rgb = normalMap.getRGB(0, 0, w, h, null, 0, w);
-        for (int i=0; i<rgb.length; i++) {
-            rgb[i] &= 0xffffff;
-            rgb[i] |= ((int)(Math.random() * 255)) << 24;
+
+        if (specularMap != null) {
+            int[] specularRgb = specularMap.getRGB(0, 0, w, h, null, 0, w);
+            for (int i=0; i<rgb.length; i++) {
+                rgb[i] |= specularRgb[i] << 24;
+            }
         }
         byteBuffer.asIntBuffer().put(rgb).rewind();
         ByteBuffer[][] pixels = {{byteBuffer}};

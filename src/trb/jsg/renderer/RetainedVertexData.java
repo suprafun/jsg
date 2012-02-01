@@ -188,7 +188,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 		ObjectArray<VertexData.TexCoordData> texCoords = vertexData.texCoords;
 		ObjectArray<VertexData.AttributeData> attributes = vertexData.attributes;
 		IntBuffer indices = vertexData.indices;
-		GL11.glBegin(GL11.GL_TRIANGLES);
+		GL11.glBegin(vertexData.mode.get());
 		GL11.glColor3f(1, 1, 1);
 		for (int index=0; index<indices.limit(); index++) {
 			int vertexIndex = indices.get(index);
@@ -396,7 +396,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 		GL11.glVertexPointer(3, 0, coords);
 
 		indices.rewind();
-		GL11.glDrawElements(GL11.GL_TRIANGLES, indices);
+		GL11.glDrawElements(vertexData.mode.get(), indices);
 
 		for (int attribIdx=0; attribIdx<attributes.length(); attribIdx++) {
 			if (attributes.get(attribIdx) != null) {

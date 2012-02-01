@@ -45,6 +45,7 @@ import trb.jsg.enums.BlendSrcFunc;
 import trb.jsg.enums.Face;
 import trb.jsg.enums.DepthFunc;
 import trb.jsg.enums.FrontFace;
+import trb.jsg.enums.PolygonMode;
 import trb.jsg.enums.StencilFunc;
 import trb.jsg.enums.StencilAction;
 import trb.jsg.util.Hash;
@@ -114,6 +115,10 @@ public class State implements Serializable {
 	public boolean polygonOffsetFillEnabled = false;
 	public float polygonOffsetFactor = 0;
 	public float polygonOffsetUnits = 0;
+
+    private PolygonMode polygonMode = PolygonMode.FILL;
+    private float lineWidth = 1f;
+    private boolean lineSmooth = false;
 	
 	// The material state.
 	private Material material;
@@ -181,6 +186,8 @@ public class State implements Serializable {
 				hash.addFloat(polygonOffsetFactor);
 				hash.addFloat(polygonOffsetUnits);
 			}
+            hash.addInt(polygonMode.get());
+            hash.addFloat(lineWidth);
 			hash.addBoolean(material != null);
 			if (material != null) {
 				hash.addFloat(material.ambientColor.x);
@@ -613,6 +620,39 @@ public class State implements Serializable {
 	public float getAlphaTestRef() {
 		return alphaTestRef;
 	}
+
+    public void setPolygonMode(PolygonMode polygonMode) {
+        if (this.polygonMode != polygonMode) {
+            this.polygonMode = polygonMode;
+            stateChanged();
+        }
+    }
+
+    public PolygonMode getPolygonMode() {
+        return polygonMode;
+    }
+
+    public void setLineWidth(float lineWidth) {
+        if (this.lineWidth != lineWidth) {
+            this.lineWidth = lineWidth;
+            stateChanged();
+        }
+    }
+
+    public float getLineWidth() {
+        return lineWidth;
+    }
+
+    public void setLineSmooth(boolean lineSmooth) {
+        if (this.lineSmooth != lineSmooth) {
+            this.lineSmooth = lineSmooth;
+            stateChanged();
+        }
+    }
+
+    public boolean getLineSmooth() {
+        return lineSmooth;
+    }
 	
 	/**
 	 * Sets the material object to the specified object. Setting it to null disables lighting. 

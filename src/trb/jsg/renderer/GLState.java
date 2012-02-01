@@ -104,6 +104,10 @@ class GLState {
 	private static boolean polygonOffsetFillEnabled = false;
 	private static float polygonOffsetFactor = 0;
 	private static float polygonOffsetUnits = 0;
+
+    private static PolygonMode polygonMode = PolygonMode.FILL;
+    private static float lineWidth = 1f;
+    private static boolean lineSmooth = false;
 	
 	private static final State.Material DEFAULT_MATERIAL = new State.Material();
 	private static boolean isMaterialSet = false;
@@ -231,6 +235,10 @@ class GLState {
 		polygonOffsetFactor = state.polygonOffsetFactor;
 		polygonOffsetUnits = state.polygonOffsetUnits;
 
+        glPolygonMode(GL_FRONT_AND_BACK, state.getPolygonMode().get());
+        glLineWidth(state.getLineWidth());
+        setEnable(GL_LINE_SMOOTH, state.getLineSmooth());
+
 		State.Material m = ((state.getMaterial() != null) ? state.getMaterial() : DEFAULT_MATERIAL);
 		material.setAmbientColor(m.getAmbientColor());
 		material.setDiffuseColor(m.getDiffuseColor());
@@ -345,6 +353,10 @@ class GLState {
 
 		setEnable(GL_POLYGON_OFFSET_FILL, polygonOffsetFillEnabled);
 		glPolygonOffset(polygonOffsetFactor, polygonOffsetUnits);
+
+        glPolygonMode(GL_FRONT_AND_BACK, polygonMode.get());
+        glLineWidth(lineWidth);
+        setEnable(GL_LINE_SMOOTH, lineSmooth);
 		
 		setMaterialColor(GL_DIFFUSE, material.getDiffuseColor());
 		setMaterialColor(GL_AMBIENT, material.getAmbientColor());
@@ -518,6 +530,21 @@ class GLState {
 			polygonOffsetUnits = state.polygonOffsetUnits;
 			glPolygonOffset(polygonOffsetFactor, polygonOffsetUnits);
 		}
+
+        if (polygonMode != state.getPolygonMode()) {
+            polygonMode = state.getPolygonMode();
+            glPolygonMode(GL_FRONT_AND_BACK, polygonMode.get());
+        }
+
+        if (lineWidth != state.getLineWidth()) {
+            lineWidth = state.getLineWidth();
+            glLineWidth(lineWidth);
+        }
+
+        if (lineSmooth != state.getLineSmooth()) {
+            lineSmooth = state.getLineSmooth();
+            setEnable(GL_LINE_SMOOTH, lineSmooth);
+        }
 
 		// enable lighting if material is set
 		if (isMaterialSet != (state.getMaterial() != null)) {
