@@ -39,11 +39,11 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.vecmath.Point3f;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
 import trb.jsg.peers.VertexDataPeer;
 import trb.jsg.util.ObjectArray;
@@ -63,10 +63,26 @@ import trb.jsg.util.Vec3;
  *
  */
 public class VertexData implements Serializable {
+
+    public enum Mode {
+        TRIANGLES(GL11.GL_TRIANGLES), LINES(GL11.GL_LINES)
+                ;
+
+            int mode;
+
+            Mode(int mode) {
+                this.mode = mode;
+            }
+
+            public int get() {
+                return mode;
+            }
+        };
 	
 	private static final long serialVersionUID = 0L;
 
 	ArrayList<Shape> parents = new ArrayList<Shape>();
+    public Mode mode = Mode.TRIANGLES;
 	public FloatBuffer coordinates;
 	public FloatBuffer normals;
 	/** Packed red, green, blue */
