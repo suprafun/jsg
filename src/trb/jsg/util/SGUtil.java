@@ -33,6 +33,8 @@
 package trb.jsg.util;
 
 import java.nio.ByteBuffer;
+import java.util.List;
+import javax.vecmath.Tuple3f;
 
 import org.lwjgl.BufferUtils;
 import trb.jsg.Texture;
@@ -78,5 +80,16 @@ public class SGUtil {
         baseTexture.setMagFilter(MagFilter.NEAREST);
         baseTexture.setMinFilter(MinFilter.NEAREST);
         return baseTexture;
+    }
+
+    public static float[] toFloats(List<? extends Tuple3f> list) {
+        float[] floats = new float[list.size()*3];
+        for (int i=0; i<list.size(); i++) {
+            Tuple3f t = list.get(i);
+            floats[i*3+0] = t.x;
+            floats[i*3+1] = t.y;
+            floats[i*3+2] = t.z;
+        }
+        return floats;
     }
 }
