@@ -34,6 +34,7 @@ package  trb.jsg;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Color4f;
 
@@ -135,6 +136,13 @@ public class RenderPass implements Serializable {
 	 */
 	public Shape getShape(int index) {
 		return shapes.get(index);
+	}
+
+	/**
+	 * Gets all the shapes.
+	 */
+	public List<Shape> getAllShapes() {
+		return new ArrayList(shapes);
 	}
 	
 	/**
