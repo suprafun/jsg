@@ -65,19 +65,28 @@ import trb.jsg.util.Vec3;
 public class VertexData implements Serializable {
 
     public enum Mode {
-        TRIANGLES(GL11.GL_TRIANGLES), LINES(GL11.GL_LINES)
-                ;
 
-            int mode;
+        POINTS(GL11.GL_POINTS),
+        LINES(GL11.GL_LINES),
+        LINE_STRIP(GL11.GL_LINE_STRIP),
+        LINE_LOOP(GL11.GL_LINE_LOOP),
+        TRIANGLES(GL11.GL_TRIANGLES),
+        TRIANGLE_STRIP(GL11.GL_TRIANGLE_STRIP),
+        TRIANGLE_FAN(GL11.GL_TRIANGLE_FAN),
+        QUADS(GL11.GL_QUADS),
+        QUAD_STRIP(GL11.GL_QUAD_STRIP),
+        POLYGON(GL11.GL_POLYGON);
 
-            Mode(int mode) {
-                this.mode = mode;
-            }
+        int mode;
 
-            public int get() {
-                return mode;
-            }
-        };
+        Mode(int mode) {
+            this.mode = mode;
+        }
+
+        public int get() {
+            return mode;
+        }
+    };
 	
 	private static final long serialVersionUID = 0L;
 
