@@ -36,26 +36,22 @@ import org.lwjgl.opengl.*;
 
 import trb.jsg.*;
 import trb.jsg.renderer.Renderer;
-import trb.jsg.util.geometry.VertexDataUtils;
 
 /**
- * Renders a single triangle in ortho mode.
+ * Tests rendering various VertexData modes.
  */
-public class Lines {
+public class VertexDataModes {
 	
 	public static void main(String[] args) throws Exception {
         Display.setDisplayMode(new DisplayMode(640, 480));
         Display.create();
 
-        float[] coordinates = {100, 100, 0,  300, 100, 0};
-        int[] indices = {0, 1};
-        VertexData vertexData = new VertexData(coordinates, null, null, 2, null, indices);
-        vertexData.mode = VertexData.Mode.LINES;
-
         RenderPass renderPass = new RenderPass();
         renderPass.setClearMask(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         renderPass.setView(View.createOrtho(0, 640, 0, 480, -1000, 1000));
-        renderPass.addShape(new Shape(vertexData));
+        renderPass.addShape(createQuads());
+        renderPass.addShape(createTriangleStrip());
+        renderPass.addShape(createLines());
         Renderer renderer = new Renderer(new SceneGraph(renderPass));
 
         while (!Display.isCloseRequested()) {
@@ -65,4 +61,26 @@ public class Lines {
 
         Display.destroy();
 	}
+
+    private static Shape createQuads() {
+        float[] coordinates = {100, 100, 0, 200, 100, 0, 200, 200, 0, 100, 200, 0};
+        VertexData vertexData = new VertexData(coordinates, null, null, 2, null, null);
+        vertexData.mode = VertexData.Mode.QUADS;
+        return new Shape(vertexData);
+    }
+
+    private static Shape createTriangleStrip() {
+        float[] coordinates = {300, 100, 0,  400, 100, 0,  300, 200, 0,  400, 200, 0};
+        VertexData vertexData = new VertexData(coordinates, null, null, 2, null, null);
+        vertexData.mode = VertexData.Mode.TRIANGLE_STRIP;
+        return new Shape(vertexData);
+    }
+
+    private static Shape createLines() {
+        float[] coordinates = {100, 50, 0, 300, 50, 0};
+        int[] indices = {0, 1};
+        VertexData vertexData = new VertexData(coordinates, null, null, 2, null, indices);
+        vertexData.mode = VertexData.Mode.LINES;
+        return new Shape(vertexData);
+    }
 }

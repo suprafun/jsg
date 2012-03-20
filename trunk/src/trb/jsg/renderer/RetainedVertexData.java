@@ -190,8 +190,9 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 		IntBuffer indices = vertexData.indices;
 		GL11.glBegin(vertexData.mode.get());
 		GL11.glColor3f(1, 1, 1);
-		for (int index=0; index<indices.limit(); index++) {
-			int vertexIndex = indices.get(index);
+        int cnt = indices != null ? indices.limit() : coords.limit()/3;
+		for (int index=0; index<cnt; index++) {
+			int vertexIndex = indices != null ? indices.get(index) : index;
 			int coordOff = vertexIndex * 3;
 			if (colors != null) {
 				GL11.glColor3f(colors.get(coordOff+0), colors.get(coordOff+1), colors.get(coordOff+2));
@@ -262,8 +263,9 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 		Point3f upper = new Point3f(Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE);
 		FloatBuffer coords = vertexData.coordinates;
 		IntBuffer indices = vertexData.indices;
-		for (int index=0; index<indices.limit(); index++) {
-			int vertexIndex = indices.get(index);
+        int cnt = indices != null ? indices.limit() : coords.limit() / 3;
+		for (int index=0; index<cnt; index++) {
+			int vertexIndex = indices != null ? indices.get(index) : index;
 			int coordOff = vertexIndex * 3;
 			tempCoord.set(coords.get(coordOff+0), coords.get(coordOff+1), coords.get(coordOff+2));
 			localToWorldMatrix.transform(tempCoord);
@@ -395,8 +397,12 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 		coords.rewind();
 		GL11.glVertexPointer(3, 0, coords);
 
-		indices.rewind();
-		GL11.glDrawElements(vertexData.mode.get(), indices);
+        if (indices != null) {
+            indices.rewind();
+            GL11.glDrawElements(vertexData.mode.get(), indices);
+        } else {
+            GL11.glDrawArrays(vertexData.mode.get(), 0, coords.limit());
+        }
 
 		for (int attribIdx=0; attribIdx<attributes.length(); attribIdx++) {
 			if (attributes.get(attribIdx) != null) {
