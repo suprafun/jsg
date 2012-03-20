@@ -158,11 +158,15 @@ public class VertexData implements Serializable {
 			}
 		}
 
-		if (this.indices == null || this.indices.capacity() < indices.length) {
-			this.indices = BufferUtils.createIntBuffer(indices.length);
-		}
-		this.indices.rewind();
-		this.indices.put(indices).flip();
+        if (indices != null) {
+            if (this.indices == null || this.indices.capacity() < indices.length) {
+                this.indices = BufferUtils.createIntBuffer(indices.length);
+            }
+            this.indices.rewind();
+            this.indices.put(indices).flip();
+        } else {
+            this.indices = null;
+        }
 
         changed();
 	}
