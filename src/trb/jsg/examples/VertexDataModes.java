@@ -32,13 +32,16 @@
 
 package trb.jsg.examples;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.lwjgl.opengl.*;
 
 import trb.jsg.*;
 import trb.jsg.renderer.Renderer;
 
 /**
- * Tests rendering various VertexData modes.
+ * Tests rendering various VertexData modes. Renders each type as static and
+ * dynamic. Static objects use display lists and dynamic vertex arrays.
  */
 public class VertexDataModes {
 	
@@ -49,12 +52,20 @@ public class VertexDataModes {
         RenderPass renderPass = new RenderPass();
         renderPass.setClearMask(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         renderPass.setView(View.createOrtho(0, 640, 0, 480, -1000, 1000));
-        renderPass.addShape(createQuads());
-        renderPass.addShape(createTriangleStrip());
-        renderPass.addShape(createLines());
+        for (Shape shape : createShapes()) {
+            renderPass.addShape(shape);
+        }
+        List<Shape> dynamicShapes = createShapes();
+        for (Shape shape : dynamicShapes) {
+            shape.setModelMatrix(shape.getModelMatrix().translate(0, 200, 0));
+            renderPass.addShape(shape);
+        }
         Renderer renderer = new Renderer(new SceneGraph(renderPass));
 
         while (!Display.isCloseRequested()) {
+            for (Shape shape : dynamicShapes) {
+                shape.getVertexData().changed();
+            }
             renderer.render();
             Display.update();
         }
@@ -62,15 +73,23 @@ public class VertexDataModes {
         Display.destroy();
 	}
 
+    private static List<Shape> createShapes() {
+        List<Shape> shapes = new ArrayList();
+        shapes.add(createQuads());
+        shapes.add(createTriangleStrip());
+        shapes.add(createLines());
+        return shapes;
+    }
+
     private static Shape createQuads() {
-        float[] coordinates = {100, 100, 0, 200, 100, 0, 200, 200, 0, 100, 200, 0};
+        float[] coordinates = {100, 100, 0, 180, 100, 0, 180, 180, 0, 100, 180, 0};
         VertexData vertexData = new VertexData(coordinates, null, null, 2, null, null);
         vertexData.mode = VertexData.Mode.QUADS;
         return new Shape(vertexData);
     }
 
     private static Shape createTriangleStrip() {
-        float[] coordinates = {300, 100, 0,  400, 100, 0,  300, 200, 0,  400, 200, 0};
+        float[] coordinates = {200, 100, 0,  280, 100, 0,  200, 180, 0,  280, 180, 0};
         VertexData vertexData = new VertexData(coordinates, null, null, 2, null, null);
         vertexData.mode = VertexData.Mode.TRIANGLE_STRIP;
         return new Shape(vertexData);
