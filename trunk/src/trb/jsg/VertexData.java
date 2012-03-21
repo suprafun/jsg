@@ -39,6 +39,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import javax.vecmath.Color4f;
 
 import javax.vecmath.Point3f;
 
@@ -96,6 +97,8 @@ public class VertexData implements Serializable {
 	public FloatBuffer normals;
 	/** Packed red, green, blue */
 	public FloatBuffer colors;
+    /** Used if colors is null */
+    public Color4f defaultColor = new Color4f(1, 1, 1, 1);
 	public final ObjectArray<TexCoordData> texCoords = new ObjectArray<TexCoordData>();
 	public final ObjectArray<AttributeData> attributes = new ObjectArray<AttributeData>();
 	public IntBuffer indices;

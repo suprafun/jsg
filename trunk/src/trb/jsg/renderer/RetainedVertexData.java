@@ -35,6 +35,7 @@ package trb.jsg.renderer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import javax.vecmath.Color4f;
 
 import javax.vecmath.Point3f;
 
@@ -189,7 +190,10 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 		ObjectArray<VertexData.AttributeData> attributes = vertexData.attributes;
 		IntBuffer indices = vertexData.indices;
 		GL11.glBegin(vertexData.mode.get());
-		GL11.glColor3f(1, 1, 1);
+        if (colors == null) {
+            Color4f c = vertexData.defaultColor;
+            GL11.glColor4f(c.x, c.y, c.z, c.w);
+        }
         int cnt = indices != null ? indices.limit() : coords.limit()/3;
 		for (int index=0; index<cnt; index++) {
 			int vertexIndex = indices != null ? indices.get(index) : index;
@@ -358,11 +362,14 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
 		}
 		
 		applyClientState(currentClientState, clientState);		
-		
+
 		if (colors != null) {
 			colors.rewind();
 			GL11.glColorPointer(3, 0, colors);
-		}
+		} else {
+            Color4f c = vertexData.defaultColor;
+            GL11.glColor4f(c.x, c.y, c.z, c.w);
+        }
 		if (normals != null) {
 			normals.rewind();
 			GL11.glNormalPointer(0, normals);
@@ -401,7 +408,7 @@ class RetainedVertexData implements VertexDataPeer, NativeResource {
             indices.rewind();
             GL11.glDrawElements(vertexData.mode.get(), indices);
         } else {
-            GL11.glDrawArrays(vertexData.mode.get(), 0, coords.limit());
+            GL11.glDrawArrays(vertexData.mode.get(), 0, coords.limit()/3);
         }
 
 		for (int attribIdx=0; attribIdx<attributes.length(); attribIdx++) {
