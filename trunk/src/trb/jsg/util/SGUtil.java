@@ -92,4 +92,47 @@ public class SGUtil {
         }
         return floats;
     }
+
+    public static int[] createIndices(int vertexCount) {
+        int[] indices = new int[vertexCount];
+        for (int i=0; i<indices.length; i++) {
+            indices[i] = i;
+        }
+        return indices;
+    }
+
+    public static int[] createTriangleStripIndices(int vertexCount) {
+        //return convertIndicesFromTriangleStripToTriangles(createIndices(vertexCount));
+        int[] newIndices = new int[(vertexCount - 2) * 3];
+        int dstIdx = 0;
+        for (int idx = 2; idx < vertexCount; idx++) {
+            if ((idx & 1) == 1) {
+                newIndices[dstIdx++] = idx - 2;
+                newIndices[dstIdx++] = idx - 1;
+                newIndices[dstIdx++] = idx;
+            } else {
+                newIndices[dstIdx++] = idx - 1;
+                newIndices[dstIdx++] = idx - 2;
+                newIndices[dstIdx++] = idx;
+            }
+        }
+        return newIndices;
+    }
+
+    public static int[] convertIndicesFromTriangleStripToTriangles(int[] indices) {
+        int[] newIndices = new int[(indices.length - 2) * 3];
+        int dstIdx = 0;
+        for (int idx = 2; idx < indices.length; idx++) {
+            if ((idx & 1) == 1) {
+                newIndices[dstIdx++] = idx - 2;
+                newIndices[dstIdx++] = idx - 1;
+                newIndices[dstIdx++] = idx;
+            } else {
+                newIndices[dstIdx++] = idx - 1;
+                newIndices[dstIdx++] = idx - 2;
+                newIndices[dstIdx++] = idx;
+            }
+        }
+        return newIndices;
+    }
 }
