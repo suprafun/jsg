@@ -366,7 +366,11 @@ class RetainedShape implements ShapePeer {
 			}
 			break;
 		case DISPLAY_LIST:
-			vertexData.drawList();
+            if (vertexData.listId > 0) {
+                vertexData.drawList();
+            } else {
+                GLState.clientState = vertexData.drawVertexArray(GLState.clientState);
+            }
 			if (worldDisplayListId > 0) {
 				worldBBox = null;
 				GL11.glDeleteLists(worldDisplayListId, 1);
@@ -409,7 +413,7 @@ class RetainedShape implements ShapePeer {
 				RetainedVertexData vertexDataPeer = (RetainedVertexData) shape.getVertexData().nativePeer;
 				vertexDataPeer.addListUser(this);
 			}
-			
+
 			renderType = newRenderType;
 		}
 	}
