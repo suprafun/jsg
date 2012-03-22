@@ -108,7 +108,7 @@ public class View implements Serializable {
     public void perspective(float fovYRad, float aspect, float near, float far) {
         this.near = near;
         this.far = far;
-        float h = (float) Math.tan(fovYRad) * near * .5f;
+        float h = (float) Math.tan(fovYRad * 0.5f) * near;
         float w = h * aspect;
         frustum(-w, w, h, -h, near, far);
     }
