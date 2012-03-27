@@ -432,7 +432,7 @@ class StateSortRenderer {
 			staticStateDirty = false;
 			
 			Comparator<RetainedShape> comparator = RetainedShape.simpleShapePeerComparator;
-			System.out.println("sort "+shapeList.elementCnt);
+			//System.out.println("sort "+shapeList.elementCnt);
 			Arrays.sort(shapeList.list, 0, shapeList.elementCnt, comparator);
 		}
 
@@ -498,7 +498,7 @@ class StateSortRenderer {
 			
 			Comparator<RetainedShape> comparator = RetainedShape.simpleShapePeerComparator;
 			Arrays.sort(shapeList.list, 0, shapeList.elementCnt, comparator);
-			System.out.println("sort vbo list "+shapeList.elementCnt);
+			//System.out.println("sort vbo list "+shapeList.elementCnt);
 		}
 
 		View view = renderPassPeer.renderPass.getView();
