@@ -102,18 +102,17 @@ public class SGUtil {
     }
 
     public static int[] createTriangleStripIndices(int vertexCount) {
-        //return convertIndicesFromTriangleStripToTriangles(createIndices(vertexCount));
         int[] newIndices = new int[(vertexCount - 2) * 3];
         int dstIdx = 0;
         for (int idx = 2; idx < vertexCount; idx++) {
             if ((idx & 1) == 1) {
-                newIndices[dstIdx++] = idx - 2;
-                newIndices[dstIdx++] = idx - 1;
                 newIndices[dstIdx++] = idx;
+                newIndices[dstIdx++] = idx - 1;
+                newIndices[dstIdx++] = idx - 2;
             } else {
-                newIndices[dstIdx++] = idx - 1;
-                newIndices[dstIdx++] = idx - 2;
                 newIndices[dstIdx++] = idx;
+                newIndices[dstIdx++] = idx - 2;
+                newIndices[dstIdx++] = idx - 1;
             }
         }
         return newIndices;
@@ -124,13 +123,13 @@ public class SGUtil {
         int dstIdx = 0;
         for (int idx = 2; idx < indices.length; idx++) {
             if ((idx & 1) == 1) {
-                newIndices[dstIdx++] = idx - 2;
-                newIndices[dstIdx++] = idx - 1;
                 newIndices[dstIdx++] = idx;
+                newIndices[dstIdx++] = idx - 1;
+                newIndices[dstIdx++] = idx - 2;
             } else {
-                newIndices[dstIdx++] = idx - 1;
-                newIndices[dstIdx++] = idx - 2;
                 newIndices[dstIdx++] = idx;
+                newIndices[dstIdx++] = idx - 2;
+                newIndices[dstIdx++] = idx - 1;
             }
         }
         return newIndices;
